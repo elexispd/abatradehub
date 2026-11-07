@@ -94,7 +94,8 @@ it('renders the email notification template with reference and quick action link
         'name' => 'Chioma Stores',
         'phone' => '+2348031112233',
         'email' => 'chioma@example.com',
-        'city' => 'Onitsha Main Market',
+        'country' => 'Benin Republic',
+        'city' => 'Cotonou Market',
         'message' => 'Looking for 30 sets immediately.',
         'source' => 'form',
     ]);
@@ -110,9 +111,10 @@ it('renders the email notification template with reference and quick action link
     $mailable = new NewEnquiryNotification($enquiry);
     $mailable->assertSeeInHtml($enquiry->reference);
     $mailable->assertSeeInHtml('Chioma Stores');
+    $mailable->assertSeeInHtml('Benin Republic');
     $mailable->assertSeeInHtml('Senator Suit Navy');
     $mailable->assertSeeInHtml('30 pcs');
-    $mailable->assertSeeInHtml('Onitsha Main Market');
+    $mailable->assertSeeInHtml('Cotonou Market');
     $mailable->assertSeeInHtml('https://wa.me/2348031112233');
     $mailable->assertSeeInHtml(url("/admin/enquiries/{$enquiry->id}/edit"));
 });

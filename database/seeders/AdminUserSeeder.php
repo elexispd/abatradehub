@@ -22,5 +22,14 @@ class AdminUserSeeder extends Seeder
         }
 
         $user->save();
+
+        $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate([
+            'name' => 'super_admin',
+            'guard_name' => 'web',
+        ]);
+
+        if (! $user->hasRole($superAdminRole)) {
+            $user->assignRole($superAdminRole);
+        }
     }
 }

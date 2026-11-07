@@ -67,6 +67,11 @@ class Product extends Model implements HasMedia
         return $this->hasMany(PriceTier::class)->orderBy('min_quantity');
     }
 
+    public function enquiryItems(): HasMany
+    {
+        return $this->hasMany(EnquiryItem::class)->latest();
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ProductStatus::Published)

@@ -46,4 +46,48 @@ class Enquiry extends Model
     {
         return $this->hasMany(EnquiryItem::class);
     }
+
+    public function getSubjectAttribute(): string
+    {
+        if ($this->items->isNotEmpty()) {
+            return $this->items->map(fn ($item) => "{$item->product_name} ({$item->quantity} pcs)")->join(', ');
+        }
+
+        return 'Instant Quote Request';
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        if ($this->items->isNotEmpty() || $this->source === 'catalog') {
+            return 'Product Enquiry';
+        }
+
+        if ($this->source === 'whatsapp') {
+            return 'WhatsApp';
+        }
+
+        return 'Instant Quote';
+    }
+
+    public function getFirstProductImageAttribute(): ?string
+    {
+        $item = $this->items->first();
+        if (! $item) {
+            return null;
+        }
+
+        $product = $item->relationLoaded('product') ? $item->product : ($item->product_id ? Product::find($item->product_id) : null);
+        if (! $product) {
+            return null;
+        }
+
+        $media = $product->getFirstMedia('images');
+        if (! $media) {
+            return null;
+        }
+
+        return $media->hasGeneratedConversion('thumb')
+            ? $media->getUrl('thumb')
+            : $media->getUrl();
+    }
 }

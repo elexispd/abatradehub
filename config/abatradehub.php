@@ -30,6 +30,16 @@ return [
 
     'currency' => env('COMPANY_CURRENCY', 'NGN'),
 
+    // Supported delivery / enquiry countries
+    'countries' => [
+        'Nigeria',
+        'Ghana',
+        'Benin Republic',
+        "Cote d'Ivoire",
+        'Sierra Leone',
+        'Other African Country',
+    ],
+
     // Optional testimonial for the home page. Set to null (or leave name empty) to hide the section.
     // The default below is SAMPLE copy from the design: replace it with a real customer quote before launch.
     'testimonial' => [

@@ -18,6 +18,9 @@ class QuoteForm extends Component
     #[Validate('required|string|min:7|max:25|regex:/^[0-9+\-\s()]+$/')]
     public string $phone = '';
 
+    #[Validate('required|string|max:100')]
+    public string $country = 'Nigeria';
+
     #[Validate('required|string|min:5|max:2000')]
     public string $message = '';
 
@@ -49,8 +52,9 @@ class QuoteForm extends Component
         $enquiry = Enquiry::create([
             'name' => $data['name'],
             'phone' => $data['phone'],
+            'country' => $data['country'] ?? $this->country,
             'message' => $data['message'],
-            'source' => 'form',
+            'source' => 'quote_form',
         ]);
 
         $adminEmail = config('abatradehub.enquiry_notification_email');

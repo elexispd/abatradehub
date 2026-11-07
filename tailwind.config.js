@@ -119,6 +119,16 @@ export default {
                 'space-lg': '1.5rem',
                 'space-xl': '2.5rem',
             },
+
+            keyframes: {
+                marquee: {
+                    '0%': { transform: 'translateX(0%)' },
+                    '100%': { transform: 'translateX(-50%)' },
+                },
+            },
+            animation: {
+                marquee: 'marquee 35s linear infinite',
+            },
         },
     },
 

@@ -30,6 +30,9 @@ class CatalogEnquiryModal extends Component
     #[Validate('required|string|min:7|max:25|regex:/^[0-9+\-\s()]+$/')]
     public string $phone = '';
 
+    #[Validate('required|string|max:100')]
+    public string $country = 'Nigeria';
+
     #[Validate('required|integer|min:1')]
     public int $quantity = 10;
 
@@ -89,6 +92,7 @@ class CatalogEnquiryModal extends Component
         $this->validate([
             'name' => 'required|string|max:120',
             'phone' => 'required|string|min:7|max:25|regex:/^[0-9+\-\s()]+$/',
+            'country' => 'required|string|max:100',
             'quantity' => "required|integer|min:{$this->productMoq}",
             'destination' => 'nullable|string|max:150',
             'notes' => 'nullable|string|max:1000',
@@ -107,9 +111,10 @@ class CatalogEnquiryModal extends Component
         $enquiry = Enquiry::create([
             'name' => $this->name,
             'phone' => $this->phone,
+            'country' => $this->country,
             'city' => $this->destination ?: null,
             'message' => $this->notes ?: "Enquiry for {$this->quantity} pcs of {$this->productName}",
-            'source' => 'form',
+            'source' => 'catalog',
         ]);
 
         EnquiryItem::create([
@@ -134,6 +139,7 @@ class CatalogEnquiryModal extends Component
         $waMessage = "Hello ".config('abatradehub.name').", I have submitted an enquiry ({$enquiry->reference}) for:\n"
             ."Product: {$this->productName} (SKU: {$this->productSku})\n"
             ."Quantity: {$this->quantity} pcs\n"
+            ."Country: {$this->country}\n"
             .($this->destination ? "Destination: {$this->destination}\n" : '')
             .($this->notes ? "Notes: {$this->notes}\n" : '')
             ."Link: {$this->productUrl}";

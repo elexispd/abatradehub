@@ -20,7 +20,7 @@
         $primaryMedia = $product->getFirstMedia('images');
         $ogImage = $primaryMedia ? ($primaryMedia->hasGeneratedConversion('card') ? $primaryMedia->getUrl('card') : $primaryMedia->getUrl()) : null;
     }
-    $ogImage = $ogImage ?: url('/favicon.ico');
+    $ogImage = $ogImage ?: asset('img/logo.png');
 @endphp
 
 <!DOCTYPE html>
@@ -32,6 +32,9 @@
     <meta name="description" content="{{ $pageDescription }}">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ $canonicalUrl }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('img/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/favicon.png') }}">
 
     {{-- Open Graph / Facebook / WhatsApp --}}
     <meta property="og:site_name" content="{{ $siteName }}">

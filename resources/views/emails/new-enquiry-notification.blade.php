@@ -75,6 +75,12 @@
                                                     <td style="padding: 4px 0; font-size: 14px; color: #1f1b17;">{{ $enquiry->email }}</td>
                                                 </tr>
                                             @endif
+                                            @if ($enquiry->country)
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-size: 13px; color: #57423a;"><strong>Country:</strong></td>
+                                                    <td style="padding: 4px 0; font-size: 14px; font-weight: 600; color: #1f1b17;">{{ $enquiry->country }}</td>
+                                                </tr>
+                                            @endif
                                             @if ($enquiry->city)
                                                 <tr>
                                                     <td style="padding: 4px 0; font-size: 13px; color: #57423a;"><strong>Destination (City/Park):</strong></td>

@@ -44,4 +44,7 @@
     html {
         scroll-behavior: auto;
     }
+    .animate-marquee {
+        animation: none !important;
+    }
 }

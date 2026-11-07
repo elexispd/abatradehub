@@ -83,16 +83,18 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label for="modal-buyer-qty" class="block text-label-md font-semibold text-on-surface mb-1">Quantity Needed</label>
-                                    <input
-                                        id="modal-buyer-qty"
-                                        type="number"
-                                        min="{{ $productMoq }}"
-                                        wire:model="quantity"
-                                        class="w-full min-h-11 rounded-lg border-0 bg-surface-container-low px-3.5 py-2.5 text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary"
+                                    <label for="modal-buyer-country" class="block text-label-md font-semibold text-on-surface mb-1">Country</label>
+                                    <select
+                                        id="modal-buyer-country"
+                                        wire:model="country"
+                                        class="w-full min-h-11 rounded-lg border-0 bg-surface-container-low px-3.5 py-2.5 text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary cursor-pointer"
                                         required
-                                    />
-                                    @error('quantity') <p class="mt-1 text-body-sm text-error">{{ $message }}</p> @enderror
+                                    >
+                                        @foreach (config('abatradehub.countries', ['Nigeria', 'Ghana', 'Benin Republic', "Cote d'Ivoire", 'Sierra Leone', 'Other African Country']) as $c)
+                                            <option value="{{ $c }}">{{ $c }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('country') <p class="mt-1 text-body-sm text-error">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label for="modal-buyer-destination" class="block text-label-md font-semibold text-on-surface mb-1">Destination (City/Park)</label>
@@ -101,10 +103,23 @@
                                         type="text"
                                         wire:model="destination"
                                         class="w-full min-h-11 rounded-lg border-0 bg-surface-container-low px-3.5 py-2.5 text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary"
-                                        placeholder="e.g. Trade Fair, Lagos"
+                                        placeholder="e.g. Lagos, Accra, Cotonou..."
                                     />
                                     @error('destination') <p class="mt-1 text-body-sm text-error">{{ $message }}</p> @enderror
                                 </div>
+                            </div>
+
+                            <div>
+                                <label for="modal-buyer-qty" class="block text-label-md font-semibold text-on-surface mb-1">Quantity Needed (Minimum: {{ $productMoq }} pieces)</label>
+                                <input
+                                    id="modal-buyer-qty"
+                                    type="number"
+                                    min="{{ $productMoq }}"
+                                    wire:model="quantity"
+                                    class="w-full min-h-11 rounded-lg border-0 bg-surface-container-low px-3.5 py-2.5 text-body-md text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary"
+                                    required
+                                />
+                                @error('quantity') <p class="mt-1 text-body-sm text-error">{{ $message }}</p> @enderror
                             </div>
 
                             <div>

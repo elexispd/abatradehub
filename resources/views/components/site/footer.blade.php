@@ -18,11 +18,8 @@
         <div class="grid grid-cols-1 gap-10 border-b border-outline-variant/30 pb-12 md:grid-cols-2 lg:grid-cols-4">
             {{-- About --}}
             <div class="space-y-4">
-                <div class="flex items-center gap-2">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container">
-                        <x-ui.icon name="storefront" class="text-[22px]" />
-                    </span>
-                    <span class="text-headline-sm font-bold text-on-surface">{{ config('abatradehub.name') }}</span>
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-40 w-40 rounded-lg object-contain shadow-xs" />
                 </div>
                 <p class="text-body-md leading-relaxed text-on-surface-variant">{{ config('abatradehub.description') }}</p>
                 <div class="flex flex-wrap gap-2 pt-2">

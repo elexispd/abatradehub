@@ -122,17 +122,27 @@ it('submits fast wholesale enquiry from modal', function () {
         ->assertSet('isOpen', true)
         ->assertSet('productName', 'Relaxed Linen Co-ord')
         ->assertSet('quantity', 10)
+        ->assertSet('country', 'Nigeria')
         ->set('name', 'Chinedu')
         ->set('phone', '+234 803 123 4567')
+        ->set('country', 'Ghana')
         ->set('quantity', 20)
-        ->set('destination', 'Balogun Market, Lagos')
+        ->set('destination', 'Makola Market, Accra')
         ->set('notes', '10 Navy, 10 Cream')
         ->call('submit')
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    expect(Enquiry::where('name', 'Chinedu')->first())
+    $savedEnquiry = Enquiry::where('name', 'Chinedu')->first();
+    expect($savedEnquiry)
         ->not->toBeNull()
-        ->city->toBe('Balogun Market, Lagos');
+        ->country->toBe('Ghana')
+        ->city->toBe('Makola Market, Accra')
+        ->source->toBe('catalog');
+
+    expect($product->fresh()->enquiryItems)->toHaveCount(1);
+    expect($product->fresh()->enquiryItems->first()->enquiry_id)->toBe($savedEnquiry->id);
+    expect($savedEnquiry->type_label)->toBe('Product Enquiry');
+    expect($savedEnquiry->subject)->toContain('Relaxed Linen Co-ord (20 pcs)');
 });
 

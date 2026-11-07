@@ -24,6 +24,7 @@ it('renders the home page with database-driven categories', function () {
 
 it('saves a quote request as a new enquiry', function () {
     Livewire::test(QuoteForm::class)
+        ->assertSet('country', 'Nigeria')
         ->set('name', 'Amaka')
         ->set('phone', '+234 801 234 5678')
         ->set('message', '20 pairs of sandals')
@@ -33,6 +34,7 @@ it('saves a quote request as a new enquiry', function () {
 
     expect(Enquiry::first())
         ->name->toBe('Amaka')
+        ->country->toBe('Nigeria')
         ->status->value->toBe('new');
 });
 

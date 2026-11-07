@@ -26,6 +26,16 @@
             </div>
 
             <div>
+                <label for="quote-country" class="mb-1.5 block text-label-md font-semibold text-on-surface">Country</label>
+                <select id="quote-country" wire:model="country" class="{{ $input }} cursor-pointer" required>
+                    @foreach (config('abatradehub.countries', ['Nigeria', 'Ghana', 'Benin Republic', "Cote d'Ivoire", 'Sierra Leone', 'Other African Country']) as $c)
+                        <option value="{{ $c }}">{{ $c }}</option>
+                    @endforeach
+                </select>
+                @error('country') <p class="mt-1 text-body-sm text-error">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
                 <label for="quote-message" class="mb-1.5 block text-label-md font-semibold text-on-surface">What items do you need?</label>
                 <textarea id="quote-message" wire:model="message" rows="3" placeholder="e.g. 20 pairs of sandals, 15 leather bags..." class="{{ $input }} resize-none" required></textarea>
                 @error('message') <p class="mt-1 text-body-sm text-error">{{ $message }}</p> @enderror

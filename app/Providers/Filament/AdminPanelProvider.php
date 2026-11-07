@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Widgets\LatestEnquiries;
 use App\Filament\Widgets\LowStockProducts;
 use App\Filament\Widgets\StatsOverview;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,10 +30,14 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('AbaTradeHub Admin')
+            ->profile(\App\Filament\Pages\Auth\EditProfile::class)
+            ->brandName('AbaTradeHub')
+            ->brandLogo(fn () => asset('img/logo.png'))
+            ->brandLogoHeight('5rem')
+            ->favicon(fn () => asset('img/favicon.png'))
             ->font('Plus Jakarta Sans')
             ->sidebarCollapsibleOnDesktop()
-            ->navigationGroups(['Sales', 'Catalog'])
+            ->navigationGroups(['Sales', 'Catalog', 'Staff Management', 'Filament Shield'])
             ->colors([
                 // Brand colours from designs/DESIGN.md (primary, secondary, tertiary, error).
                 'primary' => Color::hex('#9f3e07'),
@@ -50,6 +55,9 @@ class AdminPanelProvider extends PanelProvider
                 StatsOverview::class,
                 LatestEnquiries::class,
                 LowStockProducts::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

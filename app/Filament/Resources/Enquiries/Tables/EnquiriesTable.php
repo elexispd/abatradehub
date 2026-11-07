@@ -9,30 +9,114 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class EnquiriesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.product.media']))
             ->columns([
-                TextColumn::make('reference')->searchable()->copyable()->weight('bold'),
-                TextColumn::make('name')->searchable()->description(fn (Enquiry $record) => $record->company),
-                TextColumn::make('phone')->searchable(),
-                TextColumn::make('country')->toggleable(),
-                TextColumn::make('items_count')->counts('items')->label('Items'),
-                TextColumn::make('source')->badge()->color('gray')->toggleable(),
-                TextColumn::make('status')->badge()->sortable(),
-                TextColumn::make('created_at')->label('Received')->since()->dateTimeTooltip()->sortable(),
+                ImageColumn::make('product_image')
+                    ->label('Photo')
+                    ->state(fn (Enquiry $record) => $record->first_product_image)
+                    ->square()
+                    ->size(46)
+                    ->extraImgAttributes(['class' => 'rounded-md object-cover border border-gray-200']),
+
+                TextColumn::make('reference')
+                    ->searchable()
+                    ->copyable()
+                    ->weight('bold'),
+
+                TextColumn::make('type')
+                    ->label('Type')
+                    ->badge()
+                    ->state(fn (Enquiry $record) => $record->type_label)
+                    ->color(fn (string $state): string => match ($state) {
+                        'Product Enquiry' => 'primary',
+                        'WhatsApp' => 'success',
+                        default => 'gray',
+                    }),
+
+                TextColumn::make('product_enquiry')
+                    ->label('Product / Request')
+                    ->state(function (Enquiry $record): string {
+                        if ($record->items->isNotEmpty()) {
+                            return $record->items->map(fn ($item) => "{$item->product_name} ({$item->quantity} pcs)")->join(', ');
+                        }
+
+                        return 'General Quote Request';
+                    })
+                    ->description(function (Enquiry $record): ?string {
+                        if ($record->items->isEmpty() && $record->message) {
+                            return Str::limit($record->message, 50);
+                        }
+
+                        if ($record->items->count() === 1 && $record->items->first()->product_sku) {
+                            return 'SKU: ' . $record->items->first()->product_sku;
+                        }
+
+                        return null;
+                    })
+                    ->wrap()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->whereHas('items', function (Builder $itemQuery) use ($search) {
+                            $itemQuery->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_sku', 'like', "%{$search}%");
+                        })->orWhere('message', 'like', "%{$search}%");
+                    }),
+
+                TextColumn::make('name')
+                    ->searchable()
+                    ->description(fn (Enquiry $record) => $record->company),
+
+                TextColumn::make('phone')
+                    ->searchable()
+                    ->copyable(),
+
+                TextColumn::make('country')
+                    ->badge()
+                    ->color('gray')
+                    ->toggleable(),
+
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable(),
+
+                TextColumn::make('created_at')
+                    ->label('Received')
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 SelectFilter::make('status')->options(EnquiryStatus::class)->multiple(),
-                SelectFilter::make('source')->options(['form' => 'Website form', 'whatsapp' => 'WhatsApp']),
+                SelectFilter::make('type')
+                    ->label('Enquiry Type')
+                    ->options([
+                        'catalog' => 'Product Enquiries (Catalog)',
+                        'quote' => 'Instant Quotes (Home)',
+                        'whatsapp' => 'WhatsApp',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
+                        if ($value === 'catalog') {
+                            $query->where(fn (Builder $q) => $q->where('source', 'catalog')->orWhereHas('items'));
+                        } elseif ($value === 'quote') {
+                            $query->where(fn (Builder $q) => $q->where('source', 'quote_form')->orWhere(fn ($sq) => $sq->where('source', 'form')->doesntHave('items')));
+                        } elseif ($value === 'whatsapp') {
+                            $query->where('source', 'whatsapp');
+                        }
+                    }),
             ])
             ->recordActions([
                 Action::make('contacted')

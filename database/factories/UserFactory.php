@@ -27,16 +27,34 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'phone' => '+234'.fake()->numerify('80########'),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'is_admin' => false,
+            'is_active' => true,
+            'force_password_change' => true,
+            'last_login_at' => null,
+            'created_by' => null,
         ];
     }
 
     public function admin(): static
     {
-        return $this->state(fn () => ['is_admin' => true]);
+        return $this->state(fn () => [
+            'is_admin' => true,
+            'is_active' => true,
+        ])->afterCreating(function (User $user) {
+            $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+            $user->assignRole($role);
+        });
+    }
+
+    public function disabled(): static
+    {
+        return $this->state(fn () => [
+            'is_active' => false,
+        ]);
     }
 
     /**
@@ -49,5 +67,3 @@ class UserFactory extends Factory
         ]);
     }
 }
-
-

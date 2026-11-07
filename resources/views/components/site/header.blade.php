@@ -14,25 +14,57 @@
     x-on:keydown.escape.window="open = false"
     class="fixed inset-x-0 top-0 z-50 bg-surface/90 shadow-header backdrop-blur-xl"
 >
-    {{-- Announcement bar --}}
-    <div class="border-b border-outline-variant/30 bg-surface-container-high px-4 py-1 text-center">
-        <div class="mx-auto flex max-w-7xl items-center justify-center gap-2 text-label-sm text-on-surface-variant">
-            <x-ui.icon name="local_shipping" class="hidden shrink-0 text-[15px] text-primary sm:inline-block" />
-            <span class="truncate sm:hidden">Bulk order support on WhatsApp</span>
-            <span class="hidden truncate sm:inline">{{ config('abatradehub.topbar') }}</span>
+    {{-- Announcement bar (Continuous Marquee) --}}
+    <div class="group relative flex overflow-hidden border-b border-outline-variant/30 bg-surface-container-high py-1.5 text-label-sm select-none" role="region" aria-label="Announcements">
+        <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 sm:w-16 bg-gradient-to-r from-surface-container-high to-transparent"></div>
+        <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 sm:w-16 bg-gradient-to-l from-surface-container-high to-transparent"></div>
+
+        <div class="flex w-max shrink-0 items-center animate-marquee group-hover:[animation-play-state:paused]">
+            @for ($i = 0; $i < 2; $i++)
+                <div class="flex shrink-0 items-center gap-6 sm:gap-8 px-4" @if($i === 1) aria-hidden="true" @endif>
+                    <span class="inline-flex items-center gap-2 font-semibold text-on-surface">
+                        <x-ui.icon name="local_shipping" class="text-[17px] text-primary" />
+                        <span>Nationwide delivery across Nigeria &amp; international shipping across Africa</span>
+                    </span>
+
+                    <span class="text-outline-variant/60">&bull;</span>
+
+                    <a
+                        href="{{ \App\Support\Whatsapp::url('Hello ' . config('abatradehub.name') . ', I would like to make an enquiry about bulk wholesale orders and shipping.') }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-2.5 py-0.5 text-label-sm font-semibold text-secondary transition-all hover:bg-secondary hover:text-on-secondary"
+                        tabindex="{{ $i === 1 ? -1 : 0 }}"
+                    >
+                        <x-ui.icon name="chat" class="text-[14px]" />
+                        <span>Bulk order support on WhatsApp</span>
+                        <x-ui.icon name="arrow_outward" class="text-[12px]" />
+                    </a>
+
+                    <span class="text-outline-variant/60">&bull;</span>
+
+                    <span class="inline-flex items-center gap-1.5 font-medium text-on-surface-variant">
+                        <x-ui.icon name="verified" class="text-[16px] text-secondary" />
+                        <span>100% Pre-Shipment Quality Inspection Guaranteed</span>
+                    </span>
+
+                    <span class="text-outline-variant/60">&bull;</span>
+
+                    <span class="inline-flex items-center gap-1.5 font-medium text-on-surface-variant">
+                        <x-ui.icon name="storefront" class="text-[16px] text-primary" />
+                        <span>Factory-Direct Wholesale &bull; Ariaria, Cemetery &amp; Ekeoha Markets</span>
+                    </span>
+
+                    <span class="text-outline-variant/60">&bull;</span>
+                </div>
+            @endfor
         </div>
     </div>
 
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-8">
-        {{-- Wordmark --}}
+        {{-- Wordmark & Logo --}}
         <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3" aria-label="{{ config('abatradehub.name') }} home">
-            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-container text-on-primary-container">
-                <x-ui.icon name="storefront" class="text-[24px]" />
-            </span>
-            <span class="flex flex-col text-left leading-tight">
-                <span class="text-headline-sm font-bold tracking-tight text-on-surface">{{ config('abatradehub.name') }}</span>
-                <span class="text-label-sm uppercase tracking-wider text-primary">{{ config('abatradehub.tagline') }}</span>
-            </span>
+            <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-40 w-40 rounded-lg object-contain shadow-xs" />
         </a>
 
         {{-- Desktop navigation --}}
