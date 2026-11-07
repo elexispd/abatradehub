@@ -29,6 +29,9 @@
 
         {{-- Fast Enquiry Modal (Livewire) --}}
         <livewire:catalog-enquiry-modal />
+
+        {{-- Custom Photo Request Modal (Livewire) --}}
+        <livewire:custom-photo-request />
     </div>
 </x-layouts.public>
 

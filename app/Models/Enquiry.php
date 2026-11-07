@@ -7,11 +7,13 @@ use Database\Factories\EnquiryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Enquiry extends Model
+class Enquiry extends Model implements HasMedia
 {
     /** @use HasFactory<EnquiryFactory> */
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'reference', 'name', 'email', 'phone', 'company', 'country', 'city',
@@ -47,6 +49,11 @@ class Enquiry extends Model
         return $this->hasMany(EnquiryItem::class);
     }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('reference_photos')->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+    }
+
     public function getSubjectAttribute(): string
     {
         if ($this->items->isNotEmpty()) {
@@ -64,6 +71,10 @@ class Enquiry extends Model
 
         if ($this->source === 'whatsapp') {
             return 'WhatsApp';
+        }
+
+        if ($this->source === 'custom_photo') {
+            return 'Photo Request';
         }
 
         return 'Instant Quote';

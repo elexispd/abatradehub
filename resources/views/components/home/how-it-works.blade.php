@@ -36,13 +36,21 @@
                 </div>
                 <div>
                     <h3 class="text-headline-sm font-semibold text-on-surface">Have a specific design from Instagram or TikTok?</h3>
-                    <p class="text-body-md text-on-surface-variant">Send a screenshot to our WhatsApp rep to get instant sourcing quotes.</p>
+                    <p class="text-body-md text-on-surface-variant">Upload your reference photos and we'll source it from Ariaria Market.</p>
                 </div>
             </div>
-            <x-ui.button :href="\App\Support\Whatsapp::url('Hello, I would like a quote for a product I saw online.')" target="_blank" rel="noopener" variant="whatsapp" icon="chat" icon-position="leading" class="shrink-0">
-                Send Photo on WhatsApp
-            </x-ui.button>
+            <button
+                type="button"
+                x-data
+                x-on:click="$dispatch('open-custom-photo-request')"
+                class="shrink-0 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-container px-6 py-3 text-label-lg font-bold text-on-primary-container shadow-sm transition-all hover:bg-primary hover:text-on-primary"
+            >
+                <x-ui.icon name="add_photo_alternate" class="text-[20px]" />
+                Upload Reference Photos
+            </button>
         </div>
+
+        @livewire('custom-photo-request')
     </div>
 </section>
 

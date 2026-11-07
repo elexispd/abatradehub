@@ -7,11 +7,14 @@ use App\Filament\Resources\Enquiries\EnquiryResource;
 use App\Filament\Resources\Products\ProductResource;
 use App\Models\Enquiry;
 use App\Models\Product;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverview extends StatsOverviewWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 1;
 
     protected function getStats(): array

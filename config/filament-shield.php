@@ -120,7 +120,7 @@ return [
         'separator' => ':',
         'case' => 'pascal',
         'generate' => true,
-        'format_custom_permission_keys' => true,
+        'format_custom_permission_keys' => false,
     ],
 
     /*
@@ -262,6 +262,14 @@ return [
         'disable_user',
         'assign_roles',
         'reset_user_password',
+        'change_enquiry_status',
+        'assign_enquiry',
+        'export_enquiries',
+        'publish_product',
+        'adjust_stock',
+        'import_products_csv',
+        'export_products',
+        'manage_price_tiers',
     ],
 
     /*

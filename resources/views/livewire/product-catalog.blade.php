@@ -27,15 +27,15 @@
                     <p class="text-body-md text-on-surface-variant">
                         Send pictures from Instagram, TikTok, or your own samples to get instant bulk sourcing quotes.
                     </p>
-                    <a
-                        href="{{ \App\Support\Whatsapp::url('Hello ' . config('abatradehub.name') . ', I have reference photos for a bulk wholesale order.') }}"
-                        target="_blank"
-                        rel="noopener"
+                    <button
+                        type="button"
+                        x-data
+                        x-on:click="$dispatch('open-custom-photo-request')"
                         class="inline-flex min-h-11 items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-secondary text-on-secondary text-label-lg font-bold hover:bg-secondary/90 transition-colors shadow-sm"
                     >
-                        <x-ui.icon name="chat" class="text-[20px]" />
-                        <span>Send Photos on WhatsApp</span>
-                    </a>
+                        <x-ui.icon name="add_photo_alternate" class="text-[20px]" />
+                        <span>Send Photos for a Quote</span>
+                    </button>
                 </div>
             </div>
         </div>

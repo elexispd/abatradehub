@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
+        Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
 
         Event::listen(Login::class, RecordLastLoginAt::class);
         Event::subscribe(AuthAuditSubscriber::class);

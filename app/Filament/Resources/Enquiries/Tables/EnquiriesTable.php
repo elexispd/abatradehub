@@ -43,6 +43,7 @@ class EnquiriesTable
                     ->color(fn (string $state): string => match ($state) {
                         'Product Enquiry' => 'primary',
                         'WhatsApp' => 'success',
+                        'Photo Request' => 'warning',
                         default => 'gray',
                     }),
 
@@ -106,6 +107,7 @@ class EnquiriesTable
                         'catalog' => 'Product Enquiries (Catalog)',
                         'quote' => 'Instant Quotes (Home)',
                         'whatsapp' => 'WhatsApp',
+                        'custom_photo' => 'Photo Requests',
                     ])
                     ->query(function (Builder $query, array $data) {
                         $value = $data['value'] ?? null;
@@ -115,6 +117,8 @@ class EnquiriesTable
                             $query->where(fn (Builder $q) => $q->where('source', 'quote_form')->orWhere(fn ($sq) => $sq->where('source', 'form')->doesntHave('items')));
                         } elseif ($value === 'whatsapp') {
                             $query->where('source', 'whatsapp');
+                        } elseif ($value === 'custom_photo') {
+                            $query->where('source', 'custom_photo');
                         }
                     }),
             ])

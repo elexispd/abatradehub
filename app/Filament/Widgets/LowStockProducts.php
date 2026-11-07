@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Resources\Products\ProductResource;
 use App\Models\Product;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -12,6 +13,8 @@ use Filament\Widgets\TableWidget;
 
 class LowStockProducts extends TableWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';

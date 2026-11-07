@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\EnquiryStatus;
 use App\Filament\Resources\Enquiries\EnquiryResource;
 use App\Models\Enquiry;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -14,6 +15,8 @@ use Illuminate\Support\Str;
 
 class LatestEnquiries extends TableWidget
 {
+    use HasWidgetShield;
+
     protected static ?int $sort = 2;
 
     protected int|string|array $columnSpan = 'full';

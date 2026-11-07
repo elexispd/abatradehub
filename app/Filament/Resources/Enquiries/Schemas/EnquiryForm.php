@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class EnquiryForm
 {
@@ -35,11 +36,12 @@ class EnquiryForm
                             'catalog' => 'Catalog Product Enquiry',
                             'quote_form' => 'Instant Quote Request',
                             'whatsapp' => 'WhatsApp',
+                            'custom_photo' => 'Photo Request',
                             'form' => 'Website form (General)',
                         ])
                         ->default('catalog')
                         ->required(),
-                    DateTimePicker::make('contacted_at'),
+                    DateTimePicker::make('contacted_at')->native(false)->placeholder('Not yet contacted'),
                     Textarea::make('message')->rows(3)->columnSpanFull(),
                 ]),
                 Section::make('Enquired Products & Order Items')
@@ -103,6 +105,19 @@ class EnquiryForm
                                 TextInput::make('product_name')->label('Product name')->required()->columnSpan(2),
                                 TextInput::make('note')->label('Buyer notes / variations')->columnSpan(2),
                             ]),
+                    ]),
+                Section::make('Reference Photos')
+                    ->description('Photos submitted by the customer as style references.')
+                    ->columnSpanFull()
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('reference_photos')
+                            ->label('')
+                            ->collection('reference_photos')
+                            ->multiple()
+                            ->image()
+                            ->imagePreviewHeight('120')
+                            ->panelLayout('grid')
+                            ->disabled(),
                     ]),
                 Section::make('Staff & Negotiation Notes')
                     ->description('Private internal workspace. Customers and website visitors never see this information.')
