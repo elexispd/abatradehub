@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile
+
+Sitemap: http://abatradehub.test/sitemap.xml
