@@ -40,6 +40,14 @@ return [
         'Other African Country',
     ],
 
+    // Banking details for customer invoices
+    'bank' => [
+        'name' => env('BANK_NAME', 'First Bank of Nigeria'),
+        'account_name' => env('BANK_ACCOUNT_NAME', 'AbaTradeHub Enterprise'),
+        'account_number' => env('BANK_ACCOUNT_NUMBER', '2034567890'),
+        'instructions' => env('BANK_PAYMENT_INSTRUCTIONS', 'Please quote your Invoice Number as reference and share payment receipt via WhatsApp.'),
+    ],
+
     // Optional testimonial for the home page. Set to null (or leave name empty) to hide the section.
     // The default below is SAMPLE copy from the design: replace it with a real customer quote before launch.
     'testimonial' => [

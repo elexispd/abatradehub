@@ -18,7 +18,7 @@ class ModelAuditObserver
     public function created(Model $model): void
     {
         $modelName = class_basename($model);
-        $title = $model->name ?? ($model->reference ?? "#{$model->getKey()}");
+        $title = $model->name ?? ($model->reference ?? ($model->invoice_number ?? "#{$model->getKey()}"));
 
         AuditLog::record(
             action: 'created',
@@ -55,6 +55,10 @@ class ModelAuditObserver
             $action = 'status_changed';
             $statusVal = is_object($new['status']) && enum_exists(get_class($new['status'])) ? $new['status']->value : (string) $new['status'];
             $desc = "Changed {$modelName} ({$title}) status to [{$statusVal}]";
+        } elseif (array_key_exists('payment_status', $new)) {
+            $action = 'payment_status_changed';
+            $payVal = is_object($new['payment_status']) && enum_exists(get_class($new['payment_status'])) ? $new['payment_status']->value : (string) $new['payment_status'];
+            $desc = "Changed {$modelName} ({$title}) payment status to [{$payVal}]";
         } elseif (array_key_exists('is_active', $new)) {
             $action = $new['is_active'] ? 'enabled' : 'disabled';
             $desc = ($new['is_active'] ? 'Activated' : 'Deactivated')." {$modelName}: {$title}";
@@ -72,7 +76,7 @@ class ModelAuditObserver
     public function deleted(Model $model): void
     {
         $modelName = class_basename($model);
-        $title = $model->name ?? ($model->reference ?? "#{$model->getKey()}");
+        $title = $model->name ?? ($model->reference ?? ($model->invoice_number ?? "#{$model->getKey()}"));
 
         AuditLog::record(
             action: 'deleted',
@@ -85,7 +89,7 @@ class ModelAuditObserver
     public function restored(Model $model): void
     {
         $modelName = class_basename($model);
-        $title = $model->name ?? ($model->reference ?? "#{$model->getKey()}");
+        $title = $model->name ?? ($model->reference ?? ($model->invoice_number ?? "#{$model->getKey()}"));
 
         AuditLog::record(
             action: 'restored',

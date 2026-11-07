@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile(\App\Filament\Pages\Auth\EditProfile::class)
             ->brandName('AbaTradeHub')
-            ->brandLogo(fn () => asset('img/logo.png'))
+            ->brandLogo(fn () => asset('img/logo_light.png'))
             ->brandLogoHeight('5rem')
             ->favicon(fn () => asset('img/favicon.png'))
             ->font('Plus Jakarta Sans')

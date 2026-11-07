@@ -27,12 +27,15 @@ class StaffPermissionSeeder extends Seeder
         'import_products_csv',
         'export_products',
         'manage_price_tiers',
+        'print_invoice',
+        'record_payment',
     ];
 
     public const RESOURCE_PERMISSIONS = [
         'Category' => ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny', 'Restore', 'ForceDelete', 'Reorder'],
         'Product' => ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny', 'Restore', 'ForceDelete', 'Replicate', 'Reorder'],
         'Enquiry' => ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny', 'Restore', 'ForceDelete'],
+        'Sale' => ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny', 'Restore', 'ForceDelete'],
         'Supplier' => ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny'],
         'AuditLog' => ['ViewAny', 'View'],
         'Role' => ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny'],
@@ -42,6 +45,10 @@ class StaffPermissionSeeder extends Seeder
         'View:StatsOverview',
         'View:LatestEnquiries',
         'View:LowStockProducts',
+    ];
+
+    public const PAGE_PERMISSIONS = [
+        'View:SalesAnalytics',
     ];
 
     public function run(): void
@@ -74,7 +81,15 @@ class StaffPermissionSeeder extends Seeder
             ]);
         }
 
-        // 4. Ensure super_admin role exists
+        // 4. Page permissions
+        foreach (self::PAGE_PERMISSIONS as $pagePermission) {
+            Permission::firstOrCreate([
+                'name' => $pagePermission,
+                'guard_name' => 'web',
+            ]);
+        }
+
+        // 5. Ensure super_admin role exists
         Role::firstOrCreate([
             'name' => 'super_admin',
             'guard_name' => 'web',
@@ -101,6 +116,9 @@ class StaffPermissionSeeder extends Seeder
             'ViewAny:Product', 'View:Product',
             'ViewAny:Category', 'View:Category',
             'ViewAny:Enquiry', 'View:Enquiry', 'Create:Enquiry', 'Update:Enquiry',
+            'ViewAny:Sale', 'View:Sale', 'Create:Sale', 'Update:Sale',
+            'View:SalesAnalytics',
+            'print_invoice', 'record_payment',
             'change_enquiry_status', 'assign_enquiry', 'export_enquiries',
             'View:LatestEnquiries', 'View:StatsOverview',
         ]);

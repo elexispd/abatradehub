@@ -31,4 +31,9 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+// Admin Invoice Print View
+Route::get('/admin/sales/{sale}/invoice', [\App\Http\Controllers\InvoiceController::class, 'show'])
+    ->middleware(['web', 'auth'])
+    ->name('filament.admin.sales.invoice');
+
 require __DIR__.'/auth.php';

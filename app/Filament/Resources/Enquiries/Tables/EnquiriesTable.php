@@ -128,6 +128,45 @@ class EnquiriesTable
                     ->icon('heroicon-o-phone')
                     ->visible(fn (Enquiry $record) => $record->status === EnquiryStatus::New)
                     ->action(fn (Enquiry $record) => $record->update(['status' => EnquiryStatus::Contacted, 'contacted_at' => now()])),
+                Action::make('convert_to_sale')
+                    ->label('Create Sale / Invoice')
+                    ->icon('heroicon-o-document-currency-dollar')
+                    ->color('success')
+                    ->visible(fn () => auth()->user()?->can('Create:Sale'))
+                    ->action(function (Enquiry $record) {
+                        $sale = \App\Models\Sale::create([
+                            'enquiry_id' => $record->id,
+                            'customer_name' => $record->name,
+                            'customer_phone' => $record->phone,
+                            'customer_email' => $record->email,
+                            'customer_company' => $record->company,
+                            'destination_country' => $record->country ?: 'Nigeria',
+                            'destination_city' => $record->city,
+                            'order_date' => now()->toDateString(),
+                            'currency' => 'NGN',
+                            'status' => \App\Enums\SaleStatus::PendingPayment,
+                            'payment_status' => \App\Enums\PaymentStatus::Unpaid,
+                            'customer_notes' => $record->message,
+                        ]);
+
+                        foreach ($record->items as $item) {
+                            $unitPrice = (float) ($item->product?->base_price ?: 0);
+                            $sale->items()->create([
+                                'product_id' => $item->product_id,
+                                'item_name' => $item->product_name ?: 'Custom Sourced Product',
+                                'item_sku' => $item->product_sku,
+                                'quantity' => $item->quantity ?: 1,
+                                'unit_price' => $unitPrice,
+                                'total_price' => ($item->quantity ?: 1) * $unitPrice,
+                                'specifications' => $item->note,
+                            ]);
+                        }
+
+                        $sale->recalculateTotals(save: true);
+                        $record->update(['status' => EnquiryStatus::Won]);
+
+                        return redirect()->to(\App\Filament\Resources\Sales\SaleResource::getUrl('edit', ['record' => $sale]));
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([

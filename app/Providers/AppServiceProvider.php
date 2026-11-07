@@ -8,10 +8,12 @@ use App\Models\AuditLog;
 use App\Models\Category;
 use App\Models\Enquiry;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Observers\ModelAuditObserver;
 use App\Policies\AuditLogPolicy;
+use App\Policies\SalePolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
+        Gate::policy(Sale::class, SalePolicy::class);
         Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
 
         Event::listen(Login::class, RecordLastLoginAt::class);
@@ -45,5 +48,6 @@ class AppServiceProvider extends ServiceProvider
         User::observe(ModelAuditObserver::class);
         Category::observe(ModelAuditObserver::class);
         Supplier::observe(ModelAuditObserver::class);
+        Sale::observe(ModelAuditObserver::class);
     }
 }

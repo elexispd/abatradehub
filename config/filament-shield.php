@@ -270,6 +270,8 @@ return [
         'import_products_csv',
         'export_products',
         'manage_price_tiers',
+        'print_invoice',
+        'record_payment',
     ],
 
     /*
