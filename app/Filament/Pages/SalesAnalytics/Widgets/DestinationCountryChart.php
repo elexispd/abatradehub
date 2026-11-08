@@ -16,7 +16,9 @@ class DestinationCountryChart extends ChartWidget
 
     protected int | string | array $columnSpan = [
         'default' => 'full',
-        'xl' => 1,
+        'md' => 'full',
+        'lg' => 4,
+        'xl' => 4,
     ];
 
     protected ?string $heading = 'Geographic Market Distribution';

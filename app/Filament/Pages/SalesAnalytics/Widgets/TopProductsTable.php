@@ -19,7 +19,9 @@ class TopProductsTable extends TableWidget
 
     protected int | string | array $columnSpan = [
         'default' => 'full',
-        'xl' => 1,
+        'md' => 'full',
+        'lg' => 6,
+        'xl' => 6,
     ];
 
     protected static ?string $heading = 'Top Selling Wholesale Products';
