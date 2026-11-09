@@ -2,6 +2,7 @@
     $home = route('home');
     $links = [
         ['label' => 'Shop Catalogue', 'href' => url('/products')],
+        ['label' => 'Track Your Order', 'href' => route('orders.track')],
         ['label' => 'How It Works', 'href' => $home.'#how-it-works'],
         ['label' => 'Why Retailers Trust Us', 'href' => $home.'#why-us'],
         ['label' => 'Request a Quote', 'href' => $home.'#quote'],

@@ -15,15 +15,15 @@ beforeEach(function () {
 });
 
 test('guest cannot access sales analytics and is redirected to login', function () {
-    $this->get('/admin/sales-analytics')
-        ->assertRedirect('/admin/login');
+    $this->get('/' . \App\Support\Admin::path('sales-analytics'))
+        ->assertRedirect('/' . \App\Support\Admin::path('login'));
 });
 
 test('super admin and sales role can access financial sales analytics', function () {
     $superAdmin = User::factory()->admin()->create();
     $this->actingAs($superAdmin);
 
-    $this->get('/admin/sales-analytics')
+    $this->get('/' . \App\Support\Admin::path('sales-analytics'))
         ->assertOk()
         ->assertSee('Sales &amp; Financial Analytics', escape: false)
         ->assertSee('Financial Period &amp; Market Filters', escape: false)
@@ -43,7 +43,7 @@ test('super admin and sales role can access financial sales analytics', function
     $salesUser->assignRole('sales');
 
     $this->actingAs($salesUser);
-    $this->get('/admin/sales-analytics')
+    $this->get('/' . \App\Support\Admin::path('sales-analytics'))
         ->assertOk();
 });
 
@@ -52,12 +52,12 @@ test('unauthorized staff role cannot access financial sales analytics', function
     $clerk->assignRole('inventory_clerk');
 
     $this->actingAs($clerk);
-    $this->get('/admin/sales-analytics')
+    $this->get('/' . \App\Support\Admin::path('sales-analytics'))
         ->assertForbidden();
 
     // Grant View:SalesAnalytics permission directly
     $clerk->givePermissionTo('View:SalesAnalytics');
-    $this->get('/admin/sales-analytics')
+    $this->get('/' . \App\Support\Admin::path('sales-analytics'))
         ->assertOk();
 });
 

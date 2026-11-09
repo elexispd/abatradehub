@@ -55,11 +55,32 @@ class AuditLog extends Model
         ?array $newValues = null
     ): self {
         $user = auth()->user();
+        $userName = $user?->name;
+        $userEmail = $user?->email;
+
+        if (! $user) {
+            if ($auditable instanceof Sale) {
+                $cName = trim($auditable->customer_name ?? '');
+                $userName = $cName !== '' ? "Online Customer ({$cName})" : 'Online Customer';
+                $userEmail = $auditable->customer_email;
+            } elseif ($auditable instanceof SalePayment) {
+                $sale = $auditable->sale;
+                $cName = trim($sale?->customer_name ?? '');
+                if ($auditable->payment_method === 'paystack') {
+                    $userName = $cName !== '' ? "Online Customer ({$cName}) via Paystack" : 'Paystack Gateway';
+                } else {
+                    $userName = $cName !== '' ? "Customer ({$cName})" : 'Payment Gateway';
+                }
+                $userEmail = $sale?->customer_email;
+            } else {
+                $userName = 'System / Online Order';
+            }
+        }
 
         return static::create([
             'user_id' => $user?->id,
-            'user_name' => $user?->name ?? 'System',
-            'user_email' => $user?->email ?? null,
+            'user_name' => $userName,
+            'user_email' => $userEmail,
             'action' => $action,
             'auditable_type' => $auditable ? get_class($auditable) : null,
             'auditable_id' => $auditable?->getKey(),

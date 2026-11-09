@@ -116,6 +116,6 @@ it('renders the email notification template with reference and quick action link
     $mailable->assertSeeInHtml('30 pcs');
     $mailable->assertSeeInHtml('Cotonou Market');
     $mailable->assertSeeInHtml('https://wa.me/2348031112233');
-    $mailable->assertSeeInHtml(url("/admin/enquiries/{$enquiry->id}/edit"));
+    $mailable->assertSeeInHtml(\App\Support\Admin::url("enquiries/{$enquiry->id}/edit"));
 });
 

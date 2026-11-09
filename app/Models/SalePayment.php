@@ -25,6 +25,40 @@ class SalePayment extends Model
         'payment_date' => 'date',
     ];
 
+    /**
+     * Standard payment methods supported in AbaTradeHub.
+     *
+     * @return array<string, string>
+     */
+    public static function methodOptions(): array
+    {
+        return [
+            'paystack' => 'Paystack (Online Gateway)',
+            'bank_transfer' => 'Direct Bank Transfer',
+            'cash' => 'Cash',
+            'pos' => 'POS / Card',
+            'mobile_money' => 'Mobile Money / Transfer',
+            'escrow' => 'Escrow',
+            'other' => 'Other',
+        ];
+    }
+
+    /**
+     * Human-readable label for a payment method.
+     */
+    public static function methodLabel(?string $method): string
+    {
+        return match ($method) {
+            'paystack' => 'Paystack Online',
+            'bank_transfer' => 'Direct Bank Transfer',
+            'cash' => 'Cash',
+            'pos' => 'POS / Card',
+            'mobile_money' => 'Mobile Money / Transfer',
+            'escrow' => 'Escrow',
+            default => ucfirst(str_replace('_', ' ', (string) $method)),
+        };
+    }
+
     protected static function booted(): void
     {
         static::creating(function (SalePayment $payment) {
@@ -36,13 +70,21 @@ class SalePayment extends Model
         static::created(function (SalePayment $payment) {
             $sale = $payment->sale;
             if ($sale) {
-                $recorderName = auth()->user()?->name ?? 'Staff';
                 $method = strtoupper(str_replace('_', ' ', $payment->payment_method));
                 $amountFormatted = number_format($payment->amount, 2);
+                $isOnline = empty($payment->recorded_by) && (! auth()->check() || $payment->payment_method === 'paystack');
+
+                if ($isOnline) {
+                    $cName = trim($sale->customer_name ?? '') ?: 'Customer';
+                    $desc = "Online payment of ₦{$amountFormatted} verified via Paystack ({$cName}) for {$sale->invoice_number}";
+                } else {
+                    $recorderName = auth()->user()?->name ?? 'Staff';
+                    $desc = "Staff {$recorderName} recorded payment of ₦{$amountFormatted} ({$method}) for {$sale->invoice_number}";
+                }
 
                 AuditLog::record(
                     action: 'payment_recorded',
-                    description: "{$recorderName} recorded payment of ₦{$amountFormatted} ({$method}) for {$sale->invoice_number}",
+                    description: $desc,
                     auditable: $sale,
                     newValues: [
                         'amount' => (float) $payment->amount,

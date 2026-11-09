@@ -92,11 +92,15 @@ class SalesTable
 
                 TextColumn::make('creator.name')
                     ->label('Recorded By')
+                    ->default(fn (Sale $record) => $record->customer_name ? "Online: {$record->customer_name}" : 'Online Order')
+                    ->badge(fn (Sale $record) => $record->created_by === null)
+                    ->color(fn (Sale $record) => $record->created_by === null ? 'info' : 'gray')
                     ->description(fn (Sale $record) => $record->created_at?->format('d M, Y h:i A'))
                     ->toggleable(),
 
                 TextColumn::make('editor.name')
                     ->label('Last Edited By')
+                    ->default(fn (Sale $record) => $record->created_by === null ? ($record->payment_status === PaymentStatus::Paid ? 'Paystack Gateway' : 'Online System') : '-')
                     ->description(fn (Sale $record) => $record->updated_at?->diffForHumans())
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -157,14 +161,7 @@ class SalesTable
 
                         Select::make('payment_method')
                             ->label('Payment Method')
-                            ->options([
-                                'bank_transfer' => 'Direct Bank Transfer',
-                                'cash' => 'Cash',
-                                'pos' => 'POS / Card',
-                                'mobile_money' => 'Mobile Money / Transfer',
-                                'escrow' => 'Escrow',
-                                'other' => 'Other',
-                            ])
+                            ->options(\App\Models\SalePayment::methodOptions())
                             ->default('bank_transfer')
                             ->required(),
 

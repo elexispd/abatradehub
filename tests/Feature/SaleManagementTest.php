@@ -2,6 +2,7 @@
 
 use App\Enums\PaymentStatus;
 use App\Enums\SaleStatus;
+use App\Models\Category;
 use App\Models\Enquiry;
 use App\Models\EnquiryItem;
 use App\Models\Product;
@@ -138,10 +139,12 @@ test('sales role can view sales and invoice, while unauthorized role is forbidde
     $salesUser = User::factory()->create(['is_active' => true]);
     $salesUser->assignRole('sales');
 
+    $admin = fn (string $path = '') => '/' . \App\Support\Admin::path($path);
+
     $this->actingAs($salesUser);
-    $this->get('/admin/sales')->assertOk();
-    $this->get("/admin/sales/{$sale->id}/edit")->assertOk();
-    $this->get("/admin/sales/{$sale->id}/invoice")
+    $this->get($admin('sales'))->assertOk();
+    $this->get($admin("sales/{$sale->id}/edit"))->assertOk();
+    $this->get($admin("sales/{$sale->id}/invoice"))
         ->assertOk()
         ->assertSee($sale->invoice_number)
         ->assertSee('Amina Bello')
@@ -152,9 +155,9 @@ test('sales role can view sales and invoice, while unauthorized role is forbidde
     $clerk->assignRole('inventory_clerk');
 
     $this->actingAs($clerk);
-    $this->get('/admin/sales')->assertForbidden();
-    $this->get("/admin/sales/{$sale->id}/edit")->assertForbidden();
-    $this->get("/admin/sales/{$sale->id}/invoice")->assertForbidden();
+    $this->get($admin('sales'))->assertForbidden();
+    $this->get($admin("sales/{$sale->id}/edit"))->assertForbidden();
+    $this->get($admin("sales/{$sale->id}/invoice"))->assertForbidden();
 });
 
 test('it converts an enquiry with items into a sale with invoice', function () {
@@ -228,7 +231,7 @@ test('create sale page renders with spacious layout and catalog selection', func
     $superAdmin = User::factory()->admin()->create();
     $this->actingAs($superAdmin);
 
-    $this->get('/admin/sales/create')
+    $this->get('/' . \App\Support\Admin::path('sales/create'))
         ->assertOk()
         ->assertSee('Order & Customer Details')
         ->assertSee('Products & Line Items')
@@ -417,4 +420,145 @@ test('when order is marked completed, no one else can reverse it aside super adm
     expect($reversalLog->old_values['status'])->toBe('completed');
     expect($reversalLog->new_values['status'])->toBe('processing');
     expect($reversalLog->new_values['reason'])->toBe('Customer requested adding 20 more units of shoes');
+});
+
+it('allows staff to edit order status on fully paid online sales without payment method validation errors', function () {
+    $superAdmin = User::factory()->create([
+        'name' => 'Admin User',
+        'email' => 'admin-paystack-edit@test.com',
+        'is_active' => true,
+    ]);
+    $role = Role::findOrCreate('super_admin');
+    $superAdmin->assignRole($role);
+
+    $sale = Sale::create([
+        'invoice_number' => 'ATH-INV-2026-0005',
+        'customer_name' => 'Promise Elendu Ogbonnaya',
+        'customer_phone' => '+2348000000005',
+        'customer_email' => 'promise@example.com',
+        'destination_country' => 'Nigeria',
+        'destination_city' => 'Lagos',
+        'status' => SaleStatus::Processing,
+        'payment_status' => PaymentStatus::Paid,
+        'currency' => 'NGN',
+        'subtotal' => 6800.00,
+        'total_amount' => 6800.00,
+        'amount_paid' => 6800.00,
+        'balance_due' => 0.00,
+        'order_date' => now()->toDateString(),
+    ]);
+
+    SaleItem::create([
+        'sale_id' => $sale->id,
+        'item_name' => 'Handmade Leather Slides',
+        'quantity' => 1,
+        'unit_price' => 6800.00,
+        'total_price' => 6800.00,
+    ]);
+
+    SalePayment::create([
+        'sale_id' => $sale->id,
+        'amount' => 6800.00,
+        'payment_date' => now()->toDateString(),
+        'payment_method' => 'paystack',
+        'reference' => 'ATH-PAY-5-1794134995-29gaw',
+        'notes' => 'Online payment verified via Paystack (card)',
+    ]);
+
+    $this->actingAs($superAdmin);
+
+    // Test editing sale status via Filament EditSale component
+    Livewire::test(\App\Filament\Resources\Sales\Pages\EditSale::class, ['record' => $sale->getRouteKey()])
+        ->assertSuccessful()
+        ->assertSee('100% Fully Settled Online via Paystack')
+        ->assertSee('ATH-PAY-5-1794134995-29gaw')
+        ->assertSee('Order Placed')
+        ->assertSee('Payment Confirmed')
+        ->assertSee('Promise Elendu Ogbonnaya')
+        ->assertSee('Online Web Order')
+        ->assertDontSee('+ Add Another Installment Payment')
+        ->fillForm([
+            'status' => SaleStatus::Inspection->value,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $sale->refresh();
+    expect($sale->status)->toBe(SaleStatus::Inspection)
+        ->and($sale->payment_status)->toBe(PaymentStatus::Paid)
+        ->and($sale->amount_paid)->toEqual(6800.00);
+});
+
+it('sends a thank you email to the customer when the order is completed if an email is provided', function () {
+    \Illuminate\Support\Facades\Mail::fake();
+
+    $category = Category::factory()->create();
+    $product = Product::factory()->for($category)->create([
+        'name' => 'Senator Kaftan Special Edition',
+        'sku' => 'ATH-SN-999',
+        'base_price' => 35000,
+    ]);
+
+    $sale = Sale::create([
+        'invoice_number' => 'ATH-INV-2026-8888',
+        'customer_name' => 'Kalu Uche',
+        'customer_phone' => '+2348039991122',
+        'customer_email' => 'kalu.uche@example.com',
+        'destination_country' => 'Nigeria',
+        'destination_city' => 'Abuja',
+        'status' => SaleStatus::Processing,
+        'payment_status' => PaymentStatus::Paid,
+        'currency' => 'NGN',
+        'subtotal' => 70000.00,
+        'total_amount' => 70000.00,
+        'amount_paid' => 70000.00,
+        'balance_due' => 0.00,
+        'order_date' => now()->toDateString(),
+    ]);
+
+    SaleItem::create([
+        'sale_id' => $sale->id,
+        'product_id' => $product->id,
+        'item_name' => $product->name,
+        'item_sku' => $product->sku,
+        'quantity' => 2,
+        'unit_price' => 35000.00,
+        'total_price' => 70000.00,
+    ]);
+
+    // Ensure no email sent while in processing
+    \Illuminate\Support\Facades\Mail::assertNothingSent();
+
+    // Mark order as completed
+    $sale->status = SaleStatus::Completed;
+    $sale->save();
+
+    // Assert that thank you email was dispatched to customer email
+    \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\OrderCompletedThankYouMail::class, function ($mail) use ($sale) {
+        $hasTo = $mail->hasTo('kalu.uche@example.com');
+        $matchesSale = $mail->sale->id === $sale->id;
+
+        $rendered = $mail->render();
+        $hasThankYou = str_contains($rendered, 'Thank You for Your Wholesale Order');
+        $hasInvoice = str_contains($rendered, 'ATH-INV-2026-8888');
+        $hasProduct = str_contains($rendered, 'Senator Kaftan Special Edition');
+        $hasReorderLink = str_contains($rendered, route('products.index'));
+
+        return $hasTo && $matchesSale && $hasThankYou && $hasInvoice && $hasProduct && $hasReorderLink;
+    });
+
+    // Test that an order without customer email does not throw and sends nothing
+    \Illuminate\Support\Facades\Mail::fake();
+    $saleNoEmail = Sale::create([
+        'invoice_number' => 'ATH-INV-2026-8889',
+        'customer_name' => 'Walk-in Buyer',
+        'customer_phone' => '+2348000000000',
+        'customer_email' => null,
+        'status' => SaleStatus::Processing,
+    ]);
+
+    $saleNoEmail->status = SaleStatus::Completed;
+    $saleNoEmail->save();
+
+    \Illuminate\Support\Facades\Mail::assertNothingSent();
 });

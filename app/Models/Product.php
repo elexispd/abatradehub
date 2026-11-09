@@ -155,12 +155,35 @@ class Product extends Model implements HasMedia
             'description' => $this->description,
             'market_location' => $this->supplier?->market_location ?? 'Ariaria International Market, Aba',
             'price_tiers' => $this->priceTiers->map(fn ($tier) => [
+                'min_quantity' => (int) $tier->min_quantity,
+                'max_quantity' => $tier->max_quantity ? (int) $tier->max_quantity : null,
+                'unit_price' => (float) $tier->unit_price,
                 'range' => $tier->range_label,
                 'price_formatted' => \App\Support\Money::format($tier->unit_price, $this->currency),
             ])->values()->all(),
             'images' => $images->values()->all(),
             'primary_image' => $images->first()['card'] ?? null,
         ];
+    }
+
+    /**
+     * Get the effective wholesale unit price for a given quantity based on price tiers.
+     */
+    public function getUnitPriceForQuantity(int $quantity): float
+    {
+        $tiers = $this->priceTiers;
+        if ($tiers->isNotEmpty()) {
+            $matchingTier = $tiers->first(function (PriceTier $tier) use ($quantity) {
+                return $quantity >= $tier->min_quantity
+                    && ($tier->max_quantity === null || $quantity <= $tier->max_quantity);
+            });
+
+            if ($matchingTier) {
+                return (float) $matchingTier->unit_price;
+            }
+        }
+
+        return (float) ($this->base_price ?? $this->starting_price ?? 0);
     }
 
     public function registerMediaCollections(): void

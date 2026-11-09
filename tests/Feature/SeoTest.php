@@ -10,6 +10,7 @@ it('serves a valid robots.txt file with sitemap reference and admin disallow', f
         ->assertSee('User-agent: *')
         ->assertSee('Allow: /')
         ->assertSee('Disallow: /admin')
+        ->assertSee('Disallow: /' . \App\Support\Admin::path())
         ->assertSee(url('/sitemap.xml'));
 });
 

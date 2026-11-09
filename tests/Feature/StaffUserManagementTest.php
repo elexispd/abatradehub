@@ -20,13 +20,13 @@ beforeEach(function () {
 test('a user with no roles cannot access the admin panel', function () {
     $user = User::factory()->create(['is_active' => true]);
 
-    $this->actingAs($user)->get('/admin')->assertForbidden();
+    $this->actingAs($user)->get('/' . \App\Support\Admin::path())->assertForbidden();
 });
 
 test('a disabled user cannot access the admin panel', function () {
     $user = User::factory()->admin()->create(['is_active' => false]);
 
-    $this->actingAs($user)->get('/admin')->assertForbidden();
+    $this->actingAs($user)->get('/' . \App\Support\Admin::path())->assertForbidden();
 });
 
 test('a user without view_any_user cannot access staff user list', function () {
@@ -34,7 +34,7 @@ test('a user without view_any_user cannot access staff user list', function () {
     $staff = User::factory()->create(['is_active' => true]);
     $staff->assignRole($role);
 
-    $this->actingAs($staff)->get('/admin/users')->assertForbidden();
+    $this->actingAs($staff)->get('/' . \App\Support\Admin::path('users'))->assertForbidden();
 });
 
 test('a user without create_user gets 403 on the create page', function () {
@@ -44,7 +44,7 @@ test('a user without create_user gets 403 on the create page', function () {
     $staff = User::factory()->create(['is_active' => true]);
     $staff->assignRole($role);
 
-    $this->actingAs($staff)->get('/admin/users/create')->assertForbidden();
+    $this->actingAs($staff)->get('/' . \App\Support\Admin::path('users/create'))->assertForbidden();
 });
 
 test('a user with create_user but not assign_roles cannot set roles', function () {

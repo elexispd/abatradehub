@@ -44,9 +44,15 @@ it('validates the quote form', function () {
         ->assertHasErrors(['name', 'phone', 'message']);
 });
 
-it('only lets admins into the admin panel', function () {
-    $this->get('/admin')->assertRedirect();
+it('only lets admins into the admin panel and blocks generic /admin with honeypot decoy', function () {
+    // Honeypot / Scanner Decoy blocks generic /admin probes with 404
+    $this->get('/admin')->assertNotFound();
+    $this->get('/admin/login')->assertNotFound();
 
-    $this->actingAs(\App\Models\User::factory()->create())->get('/admin')->assertForbidden();
-    $this->actingAs(\App\Models\User::factory()->admin()->create())->get('/admin')->assertOk();
+    // Custom protected admin route behaves properly
+    $adminPath = '/' . \App\Support\Admin::path();
+    $this->get($adminPath)->assertRedirect();
+
+    $this->actingAs(\App\Models\User::factory()->create())->get($adminPath)->assertForbidden();
+    $this->actingAs(\App\Models\User::factory()->admin()->create())->get($adminPath)->assertOk();
 });

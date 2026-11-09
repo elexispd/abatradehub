@@ -200,16 +200,6 @@
                     {{-- High-Priority Action Buttons --}}
                     <div class="space-y-3 pt-1">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <a
-                                href="{{ $product->whatsapp_url }}"
-                                target="_blank"
-                                rel="noopener"
-                                class="flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-secondary px-6 py-3.5 text-label-lg font-bold text-on-secondary shadow-md hover:bg-secondary/90 transition-all active:scale-[0.99]"
-                            >
-                                <x-ui.icon name="chat" class="text-[22px]" />
-                                <span>Order on WhatsApp</span>
-                            </a>
-
                             <button
                                 type="button"
                                 x-on:click="$dispatch('open-enquiry-modal', { product: {{ $quickViewData }} })"
@@ -218,9 +208,18 @@
                                 <x-ui.icon name="edit_note" class="text-[22px]" />
                                 <span>Submit Bulk Enquiry</span>
                             </button>
+
+                            <button
+                                type="button"
+                                x-on:click="$dispatch('add-to-basket', { product: {{ $quickViewData }} })"
+                                class="flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-secondary px-6 py-3.5 text-label-lg font-bold text-on-secondary shadow-md hover:bg-secondary/90 transition-all active:scale-[0.99]"
+                            >
+                                <x-ui.icon name="shopping_basket" class="text-[22px]" />
+                                <span>Add to Wholesale Basket</span>
+                            </button>
                         </div>
                         <p class="text-center text-body-sm text-on-surface-variant">
-                            WhatsApp orders connect directly with our sourcing desk for immediate photo &amp; size confirmation.
+                            Add multiple wholesale styles to your basket for combined waybill dispatch and central Paystack checkout.
                         </p>
                     </div>
 
@@ -298,6 +297,9 @@
 
         {{-- Fast Enquiry Modal (Livewire) --}}
         <livewire:catalog-enquiry-modal />
+
+        {{-- Direct Paystack Payment Modal (Livewire) --}}
+        <livewire:catalog-payment-modal />
 
         {{-- Quick View Modal (Alpine) --}}
         <x-catalog.quick-view-modal />

@@ -71,8 +71,8 @@ it('renders product detail page with clean URL /products/{category}/{product}', 
         ->assertSee('Lead Time: 5-7 days')
         ->assertSee('Wholesale Volume Discount Tiers')
         ->assertSee('50+ pieces')
-        ->assertSee('Order on WhatsApp')
-        ->assertSee('Submit Bulk Enquiry');
+        ->assertSee('Submit Bulk Enquiry')
+        ->assertSee('Add to Wholesale Basket');
 });
 
 it('redirects product detail to canonical category if category does not match', function () {

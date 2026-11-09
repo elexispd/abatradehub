@@ -22,10 +22,11 @@ test('only super admin can access audit logs resource', function () {
     $manager = User::factory()->create(['is_active' => true]);
     $manager->assignRole($role);
 
-    $this->actingAs($manager)->get('/admin/audit-logs')->assertForbidden();
+    $adminLogs = '/' . \App\Support\Admin::path('audit-logs');
+    $this->actingAs($manager)->get($adminLogs)->assertForbidden();
 
     $superAdmin = User::factory()->admin()->create();
-    $this->actingAs($superAdmin)->get('/admin/audit-logs')->assertOk();
+    $this->actingAs($superAdmin)->get($adminLogs)->assertOk();
 });
 
 test('staff login and logout events generate audit logs', function () {

@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path(\App\Support\Admin::path())
             ->login()
             ->profile(\App\Filament\Pages\Auth\EditProfile::class)
             ->brandName('AbaTradeHub')

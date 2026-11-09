@@ -71,7 +71,7 @@ class CreateSuperAdminCommand extends Command
         $user->assignRole($superAdminRole);
 
         $this->info("Super Admin [{$user->name}] ({$user->email}) created successfully!");
-        $this->info('Login URL: '.url('/admin/login'));
+        $this->info('Login URL: '.\App\Support\Admin::url('login'));
 
         return self::SUCCESS;
     }

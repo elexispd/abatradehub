@@ -336,6 +336,7 @@ class SalesAnalyticsService
         $payments = $this->getPaymentsQuery($filters)->get();
 
         $methodLabels = [
+            'paystack' => 'Paystack Online',
             'bank_transfer' => 'Bank Transfer',
             'cash' => 'Cash',
             'pos' => 'POS / Card',

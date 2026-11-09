@@ -47,14 +47,7 @@ class EditSale extends EditRecord
 
                     Select::make('payment_method')
                         ->label('Payment Method')
-                        ->options([
-                            'bank_transfer' => 'Direct Bank Transfer',
-                            'cash' => 'Cash',
-                            'pos' => 'POS / Card',
-                            'mobile_money' => 'Mobile Money / Transfer',
-                            'escrow' => 'Escrow',
-                            'other' => 'Other',
-                        ])
+                        ->options(\App\Models\SalePayment::methodOptions())
                         ->default('bank_transfer')
                         ->required(),
 

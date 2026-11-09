@@ -2,6 +2,7 @@
     $nav = [
         ['label' => 'Home', 'href' => route('home'), 'active' => request()->routeIs('home')],
         ['label' => 'Shop / Catalogue', 'href' => url('/products'), 'active' => request()->is('products*')],
+        ['label' => 'Track Order', 'href' => route('orders.track'), 'active' => request()->routeIs('orders.track*')],
         ['label' => 'How It Works', 'href' => route('home').'#how-it-works', 'active' => false],
         ['label' => 'Why Us', 'href' => route('home').'#why-us', 'active' => false],
         ['label' => 'Contact', 'href' => route('home').'#quote', 'active' => false],
@@ -83,7 +84,7 @@
         </nav>
 
         <div class="flex shrink-0 items-center gap-2 sm:gap-3">
-            
+            <livewire:basket-counter />
             <x-ui.button :href="$quoteUrl" size="sm">Get a Quote</x-ui.button>
 
             <button

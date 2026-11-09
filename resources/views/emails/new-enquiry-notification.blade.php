@@ -12,7 +12,7 @@
             $cleanPhone = '234' . substr($cleanPhone, 1);
         }
         $buyerWhatsAppUrl = "https://wa.me/{$cleanPhone}";
-        $adminUrl = url("/admin/enquiries/{$enquiry->id}/edit");
+        $adminUrl = \App\Support\Admin::url("enquiries/{$enquiry->id}/edit");
     @endphp
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff8f5; padding: 32px 16px;">

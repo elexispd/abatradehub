@@ -102,26 +102,27 @@
         </div>
     </div>
 
-    {{-- Actions: 44px min touch target on mobile & desktop --}}
-    <div class="grid grid-cols-5 gap-2 pt-3 sm:pt-4">
+    {{-- Actions: Enquiry & Add to Basket buttons --}}
+    <div class="grid grid-cols-2 gap-2 pt-3 sm:pt-4">
         <button
             type="button"
             x-on:click="$dispatch('open-enquiry-modal', { product: {{ $quickViewData }} })"
-            class="col-span-4 flex min-h-11 items-center justify-center rounded-lg bg-primary-container px-3 py-2 text-center text-label-md sm:text-label-lg font-semibold text-on-primary-container shadow-xs transition-colors hover:bg-primary active:scale-[0.99]"
+            class="flex min-h-11 items-center justify-center gap-1 rounded-lg bg-primary-container px-2.5 py-2 text-center text-[12px] sm:text-label-md font-bold text-on-primary-container shadow-xs transition-colors hover:bg-primary active:scale-[0.99]"
+            title="Make a wholesale enquiry"
         >
-            Make an Enquiry
+            <x-ui.icon name="edit_note" class="text-[17px] sm:text-[19px]" />
+            <span>Enquire</span>
         </button>
 
-        <a
-            href="{{ $product->whatsapp_url }}"
-            target="_blank"
-            rel="noopener"
-            class="col-span-1 flex min-h-11 items-center justify-center rounded-lg bg-surface-container text-secondary transition-colors hover:bg-surface-container-high active:scale-95"
-            title="Chat on WhatsApp about {{ $product->name }}"
-            aria-label="Chat on WhatsApp about {{ $product->name }}"
+        <button
+            type="button"
+            x-on:click="$dispatch('add-to-basket', { product: {{ $quickViewData }} })"
+            class="flex min-h-11 items-center justify-center gap-1 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high hover:text-secondary px-2.5 py-2 text-center text-[12px] sm:text-label-md font-bold transition-colors active:scale-[0.99] border border-outline-variant/30"
+            title="Add {{ $product->name }} to Wholesale Basket"
         >
-            <x-ui.icon name="chat" class="text-[20px]" />
-        </a>
+            <x-ui.icon name="shopping_basket" class="text-[17px] sm:text-[19px] text-secondary" />
+            <span>+ Basket</span>
+        </button>
     </div>
 </article>
 

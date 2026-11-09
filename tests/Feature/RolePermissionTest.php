@@ -20,21 +20,23 @@ test('a user with only view category permission can only access categories and g
 
     $this->actingAs($staff);
 
+    $admin = fn (string $path = '') => '/' . \App\Support\Admin::path($path);
+
     // Can access panel dashboard and categories list
-    $this->get('/admin')->assertOk();
-    $this->get('/admin/categories')->assertOk();
+    $this->get($admin())->assertOk();
+    $this->get($admin('categories'))->assertOk();
 
     // Forbidden from creating categories
-    $this->get('/admin/categories/create')->assertForbidden();
+    $this->get($admin('categories/create'))->assertForbidden();
 
     // Forbidden from all other resources
-    $this->get('/admin/products')->assertForbidden();
-    $this->get('/admin/products/create')->assertForbidden();
-    $this->get('/admin/enquiries')->assertForbidden();
-    $this->get('/admin/suppliers')->assertForbidden();
-    $this->get('/admin/users')->assertForbidden();
-    $this->get('/admin/shield/roles')->assertForbidden();
-    $this->get('/admin/audit-logs')->assertForbidden();
+    $this->get($admin('products'))->assertForbidden();
+    $this->get($admin('products/create'))->assertForbidden();
+    $this->get($admin('enquiries'))->assertForbidden();
+    $this->get($admin('suppliers'))->assertForbidden();
+    $this->get($admin('users'))->assertForbidden();
+    $this->get($admin('shield/roles'))->assertForbidden();
+    $this->get($admin('audit-logs'))->assertForbidden();
 });
 
 test('only super admin can access shield roles resource', function () {
@@ -44,12 +46,14 @@ test('only super admin can access shield roles resource', function () {
     $staff = User::factory()->create(['is_active' => true]);
     $staff->assignRole($staffRole);
 
+    $admin = fn (string $path = '') => '/' . \App\Support\Admin::path($path);
+
     // Non super admin gets 403 even if ViewAny:Role was somehow assigned
-    $this->actingAs($staff)->get('/admin/shield/roles')->assertForbidden();
+    $this->actingAs($staff)->get($admin('shield/roles'))->assertForbidden();
 
     // Super admin can access roles
     $superAdmin = User::factory()->admin()->create();
-    $this->actingAs($superAdmin)->get('/admin/shield/roles')->assertOk();
+    $this->actingAs($superAdmin)->get($admin('shield/roles'))->assertOk();
 });
 
 test('super_admin role cannot be edited or deleted via policy', function () {
@@ -64,37 +68,39 @@ test('super_admin role cannot be edited or deleted via policy', function () {
 });
 
 test('starter roles have expected boundaries', function () {
+    $admin = fn (string $path = '') => '/' . \App\Support\Admin::path($path);
+
     // 1. Content Editor
     $editor = User::factory()->create(['is_active' => true]);
     $editor->assignRole('content_editor');
 
     $this->actingAs($editor);
-    $this->get('/admin/products')->assertOk();
-    $this->get('/admin/categories')->assertOk();
-    $this->get('/admin/suppliers')->assertOk();
-    $this->get('/admin/enquiries')->assertForbidden();
-    $this->get('/admin/users')->assertForbidden();
-    $this->get('/admin/shield/roles')->assertForbidden();
+    $this->get($admin('products'))->assertOk();
+    $this->get($admin('categories'))->assertOk();
+    $this->get($admin('suppliers'))->assertOk();
+    $this->get($admin('enquiries'))->assertForbidden();
+    $this->get($admin('users'))->assertForbidden();
+    $this->get($admin('shield/roles'))->assertForbidden();
 
     // 2. Inventory Clerk
     $clerk = User::factory()->create(['is_active' => true]);
     $clerk->assignRole('inventory_clerk');
 
     $this->actingAs($clerk);
-    $this->get('/admin/products')->assertOk();
-    $this->get('/admin/categories')->assertForbidden();
-    $this->get('/admin/enquiries')->assertForbidden();
-    $this->get('/admin/users')->assertForbidden();
+    $this->get($admin('products'))->assertOk();
+    $this->get($admin('categories'))->assertForbidden();
+    $this->get($admin('enquiries'))->assertForbidden();
+    $this->get($admin('users'))->assertForbidden();
 
     // 3. Sales
     $sales = User::factory()->create(['is_active' => true]);
     $sales->assignRole('sales');
 
     $this->actingAs($sales);
-    $this->get('/admin/enquiries')->assertOk();
-    $this->get('/admin/products')->assertOk();
-    $this->get('/admin/categories')->assertOk();
-    $this->get('/admin/suppliers')->assertForbidden();
-    $this->get('/admin/users')->assertForbidden();
-    $this->get('/admin/shield/roles')->assertForbidden();
+    $this->get($admin('enquiries'))->assertOk();
+    $this->get($admin('products'))->assertOk();
+    $this->get($admin('categories'))->assertOk();
+    $this->get($admin('suppliers'))->assertForbidden();
+    $this->get($admin('users'))->assertForbidden();
+    $this->get($admin('shield/roles'))->assertForbidden();
 });

@@ -44,8 +44,8 @@ class StaffSalesPerformanceTable extends TableWidget
             ->columns([
                 TextColumn::make('creator.name')
                     ->label('Staff Member')
-                    ->default('System / Direct')
-                    ->description(fn (Sale $record) => $record->creator?->email)
+                    ->default('Online Orders / Web Direct')
+                    ->description(fn (Sale $record) => $record->creator?->email ?? 'Direct online web checkout')
                     ->weight('bold'),
 
                 TextColumn::make('orders_count')

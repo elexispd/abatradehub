@@ -122,6 +122,23 @@ class Sale extends Model
                 throw new \DomainException('A paid sale record or sale with recorded payments cannot be deleted.');
             }
         });
+
+        static::saved(function (Sale $sale) {
+            // Send thank you / order completion email when order transitions to completed
+            if ($sale->wasChanged('status')) {
+                $statusVal = $sale->status instanceof SaleStatus ? $sale->status->value : (string) $sale->status;
+                if ($statusVal === 'completed' && ! empty($sale->customer_email)) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($sale->customer_email)
+                            ->send(new \App\Mail\OrderCompletedThankYouMail($sale));
+
+                        \Illuminate\Support\Facades\Log::info("Thank you email dispatched to {$sale->customer_email} for completed sale #{$sale->invoice_number}");
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Could not dispatch thank you email to {$sale->customer_email} for sale #{$sale->invoice_number}: " . $e->getMessage());
+                    }
+                }
+            }
+        });
     }
 
     public function isCompleted(): bool

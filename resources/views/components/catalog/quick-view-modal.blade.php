@@ -17,6 +17,11 @@
             const prod = this.product;
             this.close();
             this.$dispatch('open-enquiry-modal', { product: prod });
+        },
+        addToBasket() {
+            const prod = this.product;
+            this.close();
+            this.$dispatch('add-to-basket', { product: prod });
         }
     }"
     x-on:open-quick-view.window="open($event.detail)"
@@ -156,21 +161,20 @@
                                 <button
                                     type="button"
                                     x-on:click="openEnquiry()"
-                                    class="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-container px-4 py-2.5 text-label-lg font-bold text-on-primary-container hover:bg-primary transition-colors shadow-sm"
+                                    class="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-container px-4 py-2.5 text-label-md sm:text-label-lg font-bold text-on-primary-container hover:bg-primary transition-colors shadow-xs"
                                 >
                                     <x-ui.icon name="edit_note" class="text-[20px]" />
                                     <span>Make an Enquiry</span>
                                 </button>
 
-                                <a
-                                    x-bind:href="product.whatsapp_url"
-                                    target="_blank"
-                                    rel="noopener"
-                                    class="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-2.5 text-label-lg font-bold text-on-secondary hover:bg-secondary/90 transition-colors shadow-sm"
+                                <button
+                                    type="button"
+                                    x-on:click="addToBasket()"
+                                    class="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-2.5 text-label-md sm:text-label-lg font-bold text-on-secondary hover:bg-secondary/90 transition-colors shadow-sm"
                                 >
-                                    <x-ui.icon name="chat" class="text-[20px]" />
-                                    <span>Chat on WhatsApp</span>
-                                </a>
+                                    <x-ui.icon name="shopping_basket" class="text-[20px]" />
+                                    <span>Add to Basket</span>
+                                </button>
                             </div>
 
                             <a

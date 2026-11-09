@@ -55,6 +55,7 @@ class RecentPaymentsTable extends TableWidget
                     ->label('Method')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'paystack' => 'Paystack Online',
                         'bank_transfer' => 'Bank Transfer',
                         'cash' => 'Cash',
                         'pos' => 'POS / Card',
@@ -63,6 +64,7 @@ class RecentPaymentsTable extends TableWidget
                         default => ucfirst($state),
                     })
                     ->color(fn (string $state): string => match ($state) {
+                        'paystack' => 'success',
                         'bank_transfer' => 'primary',
                         'pos' => 'info',
                         'cash' => 'warning',
@@ -82,7 +84,8 @@ class RecentPaymentsTable extends TableWidget
 
                 TextColumn::make('recorder.name')
                     ->label('Recorded By')
-                    ->placeholder('System')
+                    ->default(fn (SalePayment $record) => $record->payment_method === 'paystack' ? 'Paystack Gateway' : 'Staff')
+                    ->placeholder(fn (SalePayment $record) => $record->payment_method === 'paystack' ? 'Paystack Gateway' : 'Staff')
                     ->toggleable(),
             ])
             ->recordActions([

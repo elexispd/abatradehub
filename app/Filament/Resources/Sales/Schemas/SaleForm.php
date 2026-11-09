@@ -337,12 +337,94 @@ class SaleForm
                         ]),
                 ]),
 
-                // 4. Payment Options (Complete At Once vs Progressive Installments)
-                Section::make('Payment Options & Recording')
-                    ->description('Settle payment completely at once, record installments, or generate an unpaid invoice for the customer.')
+                // 4. Payment Settlement & Recording
+                Section::make('Payment Settlement & Recording')
+                    ->description(fn (?Sale $record) => ($record && ($record->payment_status === PaymentStatus::Paid || $record->balance_due <= 0))
+                        ? 'This wholesale order has been settled in full. No additional installments or payment recording are required.'
+                        : 'Settle payment completely at once, record installments, or generate an unpaid invoice for the customer.')
                     ->schema([
+                        // Read-Only Settlement Summary when order is 100% fully paid (e.g. via Paystack or full offline payment)
+                        Placeholder::make('settled_payment_summary')
+                            ->label('')
+                            ->visible(fn (?Sale $record) => $record && ($record->payment_status === PaymentStatus::Paid || $record->balance_due <= 0))
+                            ->content(function (?Sale $record) {
+                                if (! $record) {
+                                    return null;
+                                }
+
+                                $payments = $record->payments;
+                                $isPaystack = $payments->contains(fn ($p) => $p->payment_method === 'paystack');
+                                $totalPaid = number_format($record->amount_paid, 2);
+                                $currency = $record->currency ?: 'NGN';
+
+                                $rowsHtml = '';
+                                foreach ($payments as $p) {
+                                    $amt = number_format($p->amount, 2);
+                                    $methodLabel = \App\Models\SalePayment::methodLabel($p->payment_method);
+                                    $date = $p->payment_date?->format('d M, Y') ?? '-';
+                                    $ref = $p->reference ?: '-';
+                                    $note = $p->notes ?: '-';
+                                    $isOnline = $p->payment_method === 'paystack';
+                                    $badge = $isOnline
+                                        ? "<span class='px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200'>Paystack Online</span>"
+                                        : "<span class='px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 text-gray-700 border border-gray-200'>{$methodLabel}</span>";
+
+                                    $rowsHtml .= "
+                                        <tr class='border-b border-gray-100 last:border-0 text-xs'>
+                                            <td class='py-2.5 pr-3 font-bold text-gray-900'>{$currency} {$amt}</td>
+                                            <td class='py-2.5 px-3'>{$badge}</td>
+                                            <td class='py-2.5 px-3 text-gray-600'>{$date}</td>
+                                            <td class='py-2.5 px-3 font-mono text-[11px] text-gray-700'>{$ref}</td>
+                                            <td class='py-2.5 pl-3 text-gray-500'>{$note}</td>
+                                        </tr>
+                                    ";
+                                }
+
+                                $bannerTitle = $isPaystack ? '100% Fully Settled Online via Paystack' : 'Wholesale Order Paid in Full';
+                                $bannerSubtitle = $isPaystack
+                                    ? 'Online client checkout verified and received in full. No installments or manual adjustments needed.'
+                                    : 'All wholesale items have been settled. No balance outstanding.';
+
+                                return new HtmlString("
+                                    <div class='space-y-3'>
+                                        <div class='p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between flex-wrap gap-3'>
+                                            <div class='flex items-center gap-3'>
+                                                <div class='flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white font-bold text-base shadow-xs'>✓</div>
+                                                <div>
+                                                    <h4 class='text-sm font-bold text-emerald-950'>{$bannerTitle}</h4>
+                                                    <p class='text-xs text-emerald-700 mt-0.5'>{$bannerSubtitle}</p>
+                                                </div>
+                                            </div>
+                                            <div class='text-right'>
+                                                <span class='text-[10px] uppercase font-bold text-emerald-800 tracking-wider block'>Total Settled</span>
+                                                <span class='text-base font-extrabold text-emerald-900'>{$currency} {$totalPaid}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class='overflow-x-auto rounded-xl border border-gray-200 bg-white p-3.5 shadow-2xs'>
+                                            <table class='w-full text-left'>
+                                                <thead>
+                                                    <tr class='border-b border-gray-200 text-[10px] font-bold uppercase text-gray-400'>
+                                                        <th class='pb-2 pr-3'>Amount</th>
+                                                        <th class='pb-2 px-3'>Payment Channel</th>
+                                                        <th class='pb-2 px-3'>Payment Date</th>
+                                                        <th class='pb-2 px-3'>Reference / Session</th>
+                                                        <th class='pb-2 pl-3'>Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {$rowsHtml}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ");
+                            }),
+
+                        // How is this order being paid? (Visible ONLY when order has an outstanding balance)
                         Radio::make('payment_option')
                             ->label('How is this order being paid?')
+                            ->visible(fn (?Sale $record) => ! ($record && ($record->payment_status === PaymentStatus::Paid || $record->balance_due <= 0)))
                             ->options([
                                 'unpaid' => 'Unpaid / Pay Later (Customer will pay against generated invoice)',
                                 'full' => 'Complete Payment in Full at Once (100% Settled)',
@@ -351,20 +433,13 @@ class SaleForm
                             ->default('unpaid')
                             ->live(),
 
-                        // Single Full Payment fields (shown when 'full' selected)
+                        // Single Full Payment fields (shown when 'full' selected and NOT fully paid)
                         Grid::make(['default' => 1, 'sm' => 2, 'md' => 4])
-                            ->visible(fn (Get $get) => ($get('payment_option') ?? 'unpaid') === 'full')
+                            ->visible(fn (Get $get, ?Sale $record) => ! ($record && ($record->payment_status === PaymentStatus::Paid || $record->balance_due <= 0)) && (($get('payment_option') ?? 'unpaid') === 'full'))
                             ->schema([
                                 Select::make('full_payment_method')
                                     ->label('Payment Method')
-                                    ->options([
-                                        'bank_transfer' => 'Direct Bank Transfer',
-                                        'cash' => 'Cash',
-                                        'pos' => 'POS / Card',
-                                        'mobile_money' => 'Mobile Money / Transfer',
-                                        'escrow' => 'Escrow',
-                                        'other' => 'Other',
-                                    ])
+                                    ->options(\App\Models\SalePayment::methodOptions())
                                     ->default('bank_transfer')
                                     ->required(fn (Get $get) => ($get('payment_option') ?? 'unpaid') === 'full'),
 
@@ -384,22 +459,16 @@ class SaleForm
                                     ->nullable(),
                             ]),
 
-                        // Installment Payments Repeater (shown when 'installments' selected or existing payments exist)
+                        // Installment Payments Repeater (shown ONLY when 'installments' selected and order is NOT fully paid)
                         Repeater::make('payments')
                             ->relationship()
-                            ->visible(function (Get $get, ?Sale $record) {
-                                if (($get('payment_option') ?? 'unpaid') === 'installments') {
-                                    return true;
-                                }
-
-                                return $record && $record->payments()->exists();
-                            })
+                            ->visible(fn (Get $get, ?Sale $record) => ! ($record && ($record->payment_status === PaymentStatus::Paid || $record->balance_due <= 0)) && (($get('payment_option') ?? 'unpaid') === 'installments' || ($record && $record->payments()->exists() && $record->balance_due > 0)))
                             // Once a payment is recorded / sale paid, payments cannot be deleted
                             ->deletable(fn (?Sale $record) => $record === null || ($record->payment_status !== PaymentStatus::Paid && $record->amount_paid <= 0))
                             ->itemLabel(function (array $state): ?string {
                                 $amount = (float) ($state['amount'] ?? 0);
                                 $date = $state['payment_date'] ?? 'Date unrecorded';
-                                $method = strtoupper(str_replace('_', ' ', $state['payment_method'] ?? 'bank_transfer'));
+                                $method = \App\Models\SalePayment::methodLabel($state['payment_method'] ?? 'bank_transfer');
 
                                 return "₦" . number_format($amount, 2) . " ({$method}) on {$date}";
                             })
@@ -424,14 +493,7 @@ class SaleForm
 
                                     Select::make('payment_method')
                                         ->label('Payment Method')
-                                        ->options([
-                                            'bank_transfer' => 'Direct Bank Transfer',
-                                            'cash' => 'Cash',
-                                            'pos' => 'POS / Card',
-                                            'mobile_money' => 'Mobile Money / Transfer',
-                                            'escrow' => 'Escrow',
-                                            'other' => 'Other',
-                                        ])
+                                        ->options(\App\Models\SalePayment::methodOptions())
                                         ->default('bank_transfer')
                                         ->required(),
 
@@ -466,79 +528,15 @@ class SaleForm
                             ->rows(3),
                     ]),
 
-                // 6. Staff Sales Activity & Audit Trail (Requirement 3: Record all staff activity at every point)
-                Section::make('Staff Sales Activity & Audit Trail')
-                    ->description('Complete accountability log: who recorded the sale, who edited it, and every status or payment change.')
+                // 6. Sales Activity & Audit Trail (Requirement 3: Record all staff & client activity)
+                Section::make('Sales Activity & Audit Trail')
+                    ->description('Complete accountability log: who recorded the order (staff or online client), who edited it, and every status or payment change.')
                     ->collapsible()
                     ->visible(fn (?Sale $record) => $record !== null && $record->exists)
                     ->schema([
                         Placeholder::make('audit_history')
                             ->label('')
-                            ->content(function (?Sale $record) {
-                                if (! $record) {
-                                    return null;
-                                }
-
-                                $creatorName = $record->creator?->name ?? 'System / Staff';
-                                $createdTime = $record->created_at?->format('d M, Y \a\t h:i A') ?? '-';
-                                $editorName = $record->editor?->name ?? $creatorName;
-                                $updatedTime = $record->updated_at?->format('d M, Y \a\t h:i A') ?? '-';
-
-                                $logs = $record->auditLogs()->with('user')->limit(20)->get();
-
-                                $logItemsHtml = '';
-                                if ($logs->isEmpty()) {
-                                    $logItemsHtml = "<p class='text-xs text-gray-400 italic py-2'>No edits recorded yet.</p>";
-                                } else {
-                                    foreach ($logs as $log) {
-                                        $userStr = $log->user_name ?: ($log->user?->name ?: 'Staff');
-                                        $timeStr = $log->created_at?->diffForHumans() ?? '';
-                                        $exactTime = $log->created_at?->format('d M, Y h:i A') ?? '';
-                                        $desc = htmlspecialchars($log->description);
-                                        $badgeColor = match ($log->action) {
-                                            'created' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                                            'payment_recorded' => 'bg-blue-100 text-blue-800 border-blue-200',
-                                            'status_changed' => 'bg-amber-100 text-amber-800 border-amber-200',
-                                            'payment_status_changed' => 'bg-purple-100 text-purple-800 border-purple-200',
-                                            default => 'bg-gray-100 text-gray-700 border-gray-200',
-                                        };
-
-                                        $logItemsHtml .= "
-                                            <div class='flex items-start gap-3 py-2.5 border-b border-gray-100 last:border-0 text-xs'>
-                                                <span class='px-2 py-0.5 rounded text-[10px] font-bold uppercase border {$badgeColor} shrink-0 mt-0.5'>{$log->action}</span>
-                                                <div class='flex-1 min-w-0'>
-                                                    <p class='font-medium text-gray-800 leading-snug'>{$desc}</p>
-                                                    <p class='text-[11px] text-gray-400 mt-0.5'>Staff: <span class='font-semibold text-gray-700'>{$userStr}</span> &bull; <span title='{$exactTime}'>{$timeStr}</span></p>
-                                                </div>
-                                            </div>
-                                        ";
-                                    }
-                                }
-
-                                return new HtmlString("
-                                    <div class='space-y-4'>
-                                        <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs'>
-                                            <div>
-                                                <span class='text-gray-400 font-semibold uppercase text-[10px] tracking-wider block'>Initially Recorded By:</span>
-                                                <p class='text-sm font-bold text-gray-900 mt-0.5'>{$creatorName}</p>
-                                                <p class='text-gray-500 mt-0.5'>{$createdTime}</p>
-                                            </div>
-                                            <div>
-                                                <span class='text-gray-400 font-semibold uppercase text-[10px] tracking-wider block'>Last Edited By:</span>
-                                                <p class='text-sm font-bold text-gray-900 mt-0.5'>{$editorName}</p>
-                                                <p class='text-gray-500 mt-0.5'>{$updatedTime}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class='p-4 rounded-xl bg-white border border-gray-200'>
-                                            <h4 class='text-xs font-bold uppercase tracking-wider text-gray-500 mb-2'>Activity & Edit Timeline</h4>
-                                            <div class='divide-y divide-gray-100'>
-                                                {$logItemsHtml}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ");
-                            }),
+                            ->content(fn (?Sale $record) => $record ? new HtmlString(view('filament.resources.sales.audit-history', ['record' => $record])->render()) : null),
                     ]),
             ]);
     }

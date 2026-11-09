@@ -101,6 +101,9 @@
         </a>
     </aside>
 
+    {{-- Wholesale Sourcing Basket Drawer (Livewire) --}}
+    <livewire:basket-drawer />
+
     @livewireScripts
 </body>
 </html>

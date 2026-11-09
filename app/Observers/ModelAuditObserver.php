@@ -20,9 +20,21 @@ class ModelAuditObserver
         $modelName = class_basename($model);
         $title = $model->name ?? ($model->reference ?? ($model->invoice_number ?? "#{$model->getKey()}"));
 
+        if ($model instanceof \App\Models\Sale) {
+            if (empty($model->created_by)) {
+                $cName = trim($model->customer_name ?? '') ?: 'Customer';
+                $desc = "Online wholesale order {$model->invoice_number} placed by customer {$cName}";
+            } else {
+                $staffName = auth()->user()?->name ?? 'Staff';
+                $desc = "Staff {$staffName} created Sale: {$model->invoice_number}";
+            }
+        } else {
+            $desc = "Created {$modelName}: {$title}";
+        }
+
         AuditLog::record(
             action: 'created',
-            description: "Created {$modelName}: {$title}",
+            description: $desc,
             auditable: $model,
             newValues: $this->cleanAttributes($model->getAttributes()),
         );
@@ -46,12 +58,22 @@ class ModelAuditObserver
         }
 
         $modelName = class_basename($model);
-        $title = $model->name ?? ($model->reference ?? "#{$model->getKey()}");
+        $title = $model->name ?? ($model->reference ?? ($model->invoice_number ?? "#{$model->getKey()}"));
 
         $action = 'updated';
         $desc = "Updated {$modelName}: {$title}";
 
-        if (array_key_exists('status', $new)) {
+        if ($model instanceof \App\Models\Sale && array_key_exists('status', $new)) {
+            $action = 'status_changed';
+            $statusVal = is_object($new['status']) && enum_exists(get_class($new['status'])) ? $new['status']->value : (string) $new['status'];
+            $statusLabel = ucfirst(str_replace('_', ' ', $statusVal));
+            $desc = "Changed order {$title} status to [{$statusLabel}]";
+        } elseif ($model instanceof \App\Models\Sale && array_key_exists('payment_status', $new)) {
+            $action = 'payment_status_changed';
+            $payVal = is_object($new['payment_status']) && enum_exists(get_class($new['payment_status'])) ? $new['payment_status']->value : (string) $new['payment_status'];
+            $payLabel = ucfirst(str_replace('_', ' ', $payVal));
+            $desc = "Changed order {$title} payment status to [{$payLabel}]";
+        } elseif (array_key_exists('status', $new)) {
             $action = 'status_changed';
             $statusVal = is_object($new['status']) && enum_exists(get_class($new['status'])) ? $new['status']->value : (string) $new['status'];
             $desc = "Changed {$modelName} ({$title}) status to [{$statusVal}]";

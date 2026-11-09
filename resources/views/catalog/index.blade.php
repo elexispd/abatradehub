@@ -30,6 +30,9 @@
         {{-- Fast Enquiry Modal (Livewire) --}}
         <livewire:catalog-enquiry-modal />
 
+        {{-- Direct Paystack Payment Modal (Livewire) --}}
+        <livewire:catalog-payment-modal />
+
         {{-- Custom Photo Request Modal (Livewire) --}}
         <livewire:custom-photo-request />
     </div>

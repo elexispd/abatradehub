@@ -30,6 +30,9 @@ return [
 
     'currency' => env('COMPANY_CURRENCY', 'NGN'),
 
+    // Secure custom administrative portal URL prefix (replaces generic /admin)
+    'admin_path' => env('ADMIN_PATH', 'hub-ops'),
+
     // Supported delivery / enquiry countries
     'countries' => [
         'Nigeria',

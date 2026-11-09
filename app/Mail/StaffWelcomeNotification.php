@@ -20,7 +20,7 @@ class StaffWelcomeNotification extends Mailable implements ShouldQueue
 
     public function __construct(public User $user)
     {
-        $this->loginUrl = url('/admin/login');
+        $this->loginUrl = \App\Support\Admin::url('login');
 
         $token = Password::createToken($this->user);
         $this->resetUrl = url('/reset-password/'.$token.'?email='.urlencode($this->user->email));
