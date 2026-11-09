@@ -103,24 +103,24 @@
     </div>
 
     {{-- Actions: Enquiry & Add to Basket buttons --}}
-    <div class="grid grid-cols-2 gap-2 pt-3 sm:pt-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 pt-2.5 sm:pt-3">
         <button
             type="button"
             x-on:click="$dispatch('open-enquiry-modal', { product: {{ $quickViewData }} })"
-            class="flex min-h-11 items-center justify-center gap-1 rounded-lg bg-primary-container px-2.5 py-2 text-center text-[12px] sm:text-label-md font-bold text-on-primary-container shadow-xs transition-colors hover:bg-primary active:scale-[0.99]"
+            class="flex h-8 sm:h-10 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-primary-container px-2 sm:px-3 text-center text-label-sm sm:text-label-md font-bold text-on-primary-container shadow-xs transition-colors hover:bg-primary active:scale-[0.99]"
             title="Make a wholesale enquiry"
         >
-            <x-ui.icon name="edit_note" class="text-[17px] sm:text-[19px]" />
+            <x-ui.icon name="edit_note" class="text-[16px] sm:text-[18px]" />
             <span>Enquire</span>
         </button>
 
         <button
             type="button"
             x-on:click="$dispatch('add-to-basket', { product: {{ $quickViewData }} })"
-            class="flex min-h-11 items-center justify-center gap-1 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high hover:text-secondary px-2.5 py-2 text-center text-[12px] sm:text-label-md font-bold transition-colors active:scale-[0.99] border border-outline-variant/30"
+            class="flex h-8 sm:h-10 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high hover:text-secondary px-2 sm:px-3 text-center text-label-sm sm:text-label-md font-bold transition-colors active:scale-[0.99] border border-outline-variant/30"
             title="Add {{ $product->name }} to Wholesale Basket"
         >
-            <x-ui.icon name="shopping_basket" class="text-[17px] sm:text-[19px] text-secondary" />
+            <x-ui.icon name="shopping_basket" class="text-[16px] sm:text-[18px] text-secondary" />
             <span>+ Basket</span>
         </button>
     </div>

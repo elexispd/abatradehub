@@ -62,10 +62,10 @@
         </div>
     </div>
 
-    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-8">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-3.5 sm:px-6 lg:h-20 lg:px-8">
         {{-- Wordmark & Logo --}}
-        <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3" aria-label="{{ config('abatradehub.name') }} home">
-            <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-40 w-40 rounded-lg object-contain shadow-xs" />
+        <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2.5" aria-label="{{ config('abatradehub.name') }} home">
+            <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-[50px] w-[50px] sm:h-14 sm:w-14 lg:h-16 lg:w-16 rounded-xl object-contain shadow-xs" />
         </a>
 
         {{-- Desktop navigation --}}
@@ -83,20 +83,25 @@
             @endforeach
         </nav>
 
-        <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div class="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
             <livewire:basket-counter />
-            <x-ui.button :href="$quoteUrl" size="sm">Get a Quote</x-ui.button>
+            <a
+                href="{{ $quoteUrl }}"
+                class="inline-flex h-9 sm:h-10 items-center justify-center rounded-lg bg-primary-container px-2.5 sm:px-4 text-[12px] sm:text-label-md font-bold text-on-primary-container shadow-xs transition-colors hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-container whitespace-nowrap"
+            >
+                <span>Get a Quote</span>
+            </a>
 
             <button
                 type="button"
-                class="inline-flex h-11 w-11 items-center justify-center rounded-lg text-on-surface hover:bg-surface-container xl:hidden"
+                class="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg text-on-surface hover:bg-surface-container xl:hidden"
                 x-on:click="open = ! open"
                 x-bind:aria-expanded="open.toString()"
                 aria-controls="mobile-menu"
                 aria-label="Toggle menu"
             >
-                <x-ui.icon name="menu" x-show="! open" />
-                <x-ui.icon name="close" x-show="open" x-cloak />
+                <x-ui.icon name="menu" class="text-[20px] sm:text-[24px]" x-show="! open" />
+                <x-ui.icon name="close" class="text-[20px] sm:text-[24px]" x-show="open" x-cloak />
             </button>
         </div>
     </div>

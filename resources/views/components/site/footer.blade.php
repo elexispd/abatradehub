@@ -20,7 +20,7 @@
             {{-- About --}}
             <div class="space-y-4">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-40 w-40 rounded-lg object-contain shadow-xs" />
+                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-14 w-14 sm:h-16 sm:w-16 rounded-xl object-contain shadow-xs" />
                 </div>
                 <p class="text-body-md leading-relaxed text-on-surface-variant">{{ config('abatradehub.description') }}</p>
                 <div class="flex flex-wrap gap-2 pt-2">

@@ -199,22 +199,22 @@
 
                     {{-- High-Priority Action Buttons --}}
                     <div class="space-y-3 pt-1">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                             <button
                                 type="button"
                                 x-on:click="$dispatch('open-enquiry-modal', { product: {{ $quickViewData }} })"
-                                class="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary-container px-6 py-3.5 text-label-lg font-bold text-on-primary-container shadow-md hover:bg-primary transition-all active:scale-[0.99]"
+                                class="flex min-h-11 sm:min-h-12 items-center justify-center gap-2 rounded-xl bg-primary-container px-4 sm:px-6 py-2.5 sm:py-3.5 text-label-md sm:text-label-lg font-bold text-on-primary-container shadow-md hover:bg-primary transition-all active:scale-[0.99]"
                             >
-                                <x-ui.icon name="edit_note" class="text-[22px]" />
+                                <x-ui.icon name="edit_note" class="text-[20px] sm:text-[22px]" />
                                 <span>Submit Bulk Enquiry</span>
                             </button>
 
                             <button
                                 type="button"
                                 x-on:click="$dispatch('add-to-basket', { product: {{ $quickViewData }} })"
-                                class="flex min-h-12 items-center justify-center gap-2.5 rounded-xl bg-secondary px-6 py-3.5 text-label-lg font-bold text-on-secondary shadow-md hover:bg-secondary/90 transition-all active:scale-[0.99]"
+                                class="flex min-h-11 sm:min-h-12 items-center justify-center gap-2.5 rounded-xl bg-secondary px-4 sm:px-6 py-2.5 sm:py-3.5 text-label-md sm:text-label-lg font-bold text-on-secondary shadow-md hover:bg-secondary/90 transition-all active:scale-[0.99]"
                             >
-                                <x-ui.icon name="shopping_basket" class="text-[22px]" />
+                                <x-ui.icon name="shopping_basket" class="text-[20px] sm:text-[22px]" />
                                 <span>Add to Wholesale Basket</span>
                             </button>
                         </div>

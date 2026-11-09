@@ -22,7 +22,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/" wire:navigate>
-                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="w-40 h-40 rounded-2xl object-contain shadow-sm" />
+                    <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-contain shadow-sm" />
                 </a>
             </div>
 
