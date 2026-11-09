@@ -19,6 +19,10 @@ it('renders the home page with database-driven categories', function () {
         ->assertSee('MOQ: 12 pcs')
         ->assertSee('From ₦4,500 / pc')
         ->assertSee(config('abatradehub.whatsapp_number'))
+        ->assertSee('img/home1.jpg')
+        ->assertSee('img/home2.jpg')
+        ->assertSee('img/home3.jpg')
+        ->assertSee('img/bags.webp')
         ->assertDontSee('Hidden Draft Category');
 });
 

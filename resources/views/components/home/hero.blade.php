@@ -1,5 +1,5 @@
 @props([
-    'heroProducts',
+    'heroProducts' => null,
     'minMoq' => null,
 ])
 
@@ -53,27 +53,47 @@
                 </div>
             </div>
 
-            {{-- Visual: real catalog photos when available, tonal placeholder otherwise --}}
+            {{-- Visual: 2x2 collage of authentic Aba wholesale production & goods --}}
             <div class="relative lg:col-span-5">
-                <div class="relative overflow-hidden rounded-2xl bg-surface-container shadow-xl">
+                <div class="relative overflow-hidden rounded-2xl bg-surface-container shadow-xl ring-1 ring-outline-variant/10">
                     <div class="relative aspect-[4/3] w-full overflow-hidden sm:aspect-square">
-                        @if ($heroProducts->isNotEmpty())
-                            <div class="grid h-full w-full grid-cols-2 gap-0.5">
-                                @foreach ($heroProducts as $product)
-                                    <x-product-image
-                                        :product="$product"
-                                        conversion="card"
-                                        :lazy="! $loop->first"
-                                        class="h-full w-full object-cover object-center"
-                                    />
-                                @endforeach
+                        <div class="grid h-full w-full grid-cols-2 gap-1 bg-surface-container-highest">
+                            <div class="relative h-full w-full overflow-hidden bg-surface-container">
+                                <img
+                                    src="{{ asset('img/home1.jpg') }}"
+                                    alt="Aba Wholesale Sourcing - Quality Apparel & Fashion"
+                                    class="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                                    loading="eager"
+                                    fetchpriority="high"
+                                />
                             </div>
-                        @else
-                            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-fixed to-surface-container-high text-primary">
-                                <x-ui.icon name="checkroom" class="text-[96px]" />
+                            <div class="relative h-full w-full overflow-hidden bg-surface-container">
+                                <img
+                                    src="{{ asset('img/home2.jpg') }}"
+                                    alt="Aba Wholesale Sourcing - Footwear & Leathercraft"
+                                    class="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                                    loading="eager"
+                                />
                             </div>
-                        @endif
-                        <div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent"></div>
+                            <div class="relative h-full w-full overflow-hidden bg-surface-container">
+                                <img
+                                    src="{{ asset('img/home3.jpg') }}"
+                                    alt="Aba Wholesale Sourcing - Ready-to-Wear Textiles"
+                                    class="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                                    loading="lazy"
+                                />
+                            </div>
+                            <div class="relative h-full w-full overflow-hidden bg-surface-container">
+                                <img
+                                    src="{{ asset('img/bags.webp') }}"
+                                    alt="Aba Wholesale Sourcing - Wholesale Bags & Accessories"
+                                    class="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                                    loading="lazy"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent"></div>
 
                         <div class="absolute inset-x-4 bottom-4 rounded-xl bg-surface/90 p-4 shadow-md backdrop-blur-md">
                             <div class="flex items-center gap-3">
