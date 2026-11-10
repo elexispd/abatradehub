@@ -10,7 +10,7 @@ it('serves a valid robots.txt file with sitemap reference and admin disallow', f
         ->assertSee('User-agent: *')
         ->assertSee('Allow: /')
         ->assertSee('Disallow: /admin')
-        ->assertSee('Disallow: /' . \App\Support\Admin::path())
+        ->assertDontSee('Disallow: /' . \App\Support\Admin::path())
         ->assertSee(url('/sitemap.xml'));
 });
 
@@ -67,5 +67,11 @@ it('renders Product and BreadcrumbList JSON-LD and product OpenGraph tags on pro
         ->assertSee('Aba Handcrafted Suede Loafers')
         ->assertSee('"@type": "BreadcrumbList"', false)
         ->assertSee('"name": "Footwear"', false);
+});
+
+it('ensures admin panel sends X-Robots-Tag to prevent search indexing without disclosing admin path in robots.txt', function () {
+    $response = $this->get('/' . \App\Support\Admin::path('login'));
+
+    $response->assertHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
 });
 

@@ -104,9 +104,26 @@ class PaymentController extends Controller
                 'notes' => "Online payment verified via Paystack ({$channel})",
             ]);
 
-            $sale->status = SaleStatus::Processing;
-            $sale->paid_at = now();
-            $sale->recalculateTotals(save: true);
+            $sale->refresh();
+
+            // Security check: Only advance order status to Processing if order is fully paid
+            if ($sale->payment_status === PaymentStatus::Paid || $sale->balance_due <= 0) {
+                $sale->status = SaleStatus::Processing;
+                $sale->paid_at = now();
+                $sale->saveQuietly();
+            } else {
+                Log::warning("Partial payment received for sale #{$sale->invoice_number}: expected ₦{$sale->total_amount}, received ₦{$amountInNaira}");
+                \App\Models\AuditLog::record(
+                    action: 'partial_payment_received',
+                    description: "Partial online payment of ₦{$amountInNaira} received via Paystack. Balance due: ₦{$sale->balance_due}. Order remains in Pending Payment status.",
+                    auditable: $sale,
+                    newValues: [
+                        'amount_paid' => $sale->amount_paid,
+                        'balance_due' => $sale->balance_due,
+                        'payment_status' => $sale->payment_status->value,
+                    ]
+                );
+            }
 
             $this->sendReceiptNotification($sale, $payment);
         }
@@ -212,9 +229,26 @@ class PaymentController extends Controller
                             'notes' => "Webhook confirmed Paystack payment ({$channel})",
                         ]);
 
-                        $sale->status = SaleStatus::Processing;
-                        $sale->paid_at = now();
-                        $sale->recalculateTotals(save: true);
+                        $sale->refresh();
+
+                        // Security check: Only advance order status to Processing if order is fully paid
+                        if ($sale->payment_status === PaymentStatus::Paid || $sale->balance_due <= 0) {
+                            $sale->status = SaleStatus::Processing;
+                            $sale->paid_at = now();
+                            $sale->saveQuietly();
+                        } else {
+                            Log::warning("Partial payment received via webhook for sale #{$sale->invoice_number}: expected ₦{$sale->total_amount}, received ₦{$amountInNaira}");
+                            \App\Models\AuditLog::record(
+                                action: 'partial_payment_received',
+                                description: "Partial online payment of ₦{$amountInNaira} received via Paystack webhook. Balance due: ₦{$sale->balance_due}. Order remains in Pending Payment status.",
+                                auditable: $sale,
+                                newValues: [
+                                    'amount_paid' => $sale->amount_paid,
+                                    'balance_due' => $sale->balance_due,
+                                    'payment_status' => $sale->payment_status->value,
+                                ]
+                            );
+                        }
 
                         $this->sendReceiptNotification($sale, $payment);
 

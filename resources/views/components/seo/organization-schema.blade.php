@@ -28,8 +28,11 @@
         ],
         'knowsAbout' => [
             'Wholesale Clothing Manufacturing',
+            'Wholesale Fashion Footwear Manufacturing',
+            'Wholesale Bag Manufacturing',
             'Aba Garment Production',
             'Bulk Senator Wear',
+            'Native Wears',
             'African Fashion Wholesale',
             'Textiles and Leather Footwear',
         ],

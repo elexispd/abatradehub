@@ -11,8 +11,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/sitemap.xml', SitemapController::class)->name('seo.sitemap');
 Route::get('/robots.txt', function () {
     $sitemap = url('/sitemap.xml');
-    $adminPath = \App\Support\Admin::path();
-    $content = "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /{$adminPath}\nDisallow: /dashboard\nDisallow: /profile\n\nSitemap: {$sitemap}\n";
+    $content = "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /dashboard\nDisallow: /profile\n\nSitemap: {$sitemap}\n";
 
     return response($content, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
 })->name('seo.robots');

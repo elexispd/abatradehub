@@ -572,3 +572,64 @@ it('renders official receipt with watermark, logo image, and shipment tracking l
     // Verify shipment tracking live link
     $response->assertSee(route('orders.track', ['invoice' => $sale->invoice_number]));
 });
+
+it('does not advance order status to processing when paystack payment is partial or underpaid', function () {
+    $sale = Sale::create([
+        'invoice_number' => 'ATH-INV-2026-UNDERPAY-1',
+        'customer_name' => 'Chioma Ade',
+        'customer_email' => 'chioma@example.com',
+        'customer_phone' => '+234 803 111 2222',
+        'destination_country' => 'Nigeria',
+        'destination_city' => 'Lagos',
+        'status' => SaleStatus::PendingPayment,
+        'payment_status' => PaymentStatus::Unpaid,
+        'currency' => 'NGN',
+        'subtotal' => 100000.00,
+        'total_amount' => 100000.00,
+        'balance_due' => 100000.00,
+        'amount_paid' => 0.00,
+        'order_date' => now()->toDateString(),
+    ]);
+
+    SaleItem::create([
+        'sale_id' => $sale->id,
+        'item_name' => 'Underpayment Test Item',
+        'quantity' => 10,
+        'unit_price' => 10000.00,
+        'total_price' => 100000.00,
+    ]);
+
+    $mockReference = "ATH-PAY-{$sale->id}-underpay-test";
+
+    // Customer paid only 1,000 NGN instead of 100,000 NGN (100,000 kobo vs 10,000,000 kobo)
+    Http::fake([
+        "https://api.paystack.co/transaction/verify/{$mockReference}" => Http::response([
+            'status' => true,
+            'message' => 'Verification successful',
+            'data' => [
+                'status' => 'success',
+                'reference' => $mockReference,
+                'amount' => 100000, // 1,000 NGN in kobo
+                'channel' => 'card',
+                'metadata' => [
+                    'sale_id' => $sale->id,
+                ],
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->get(route('payment.callback', ['reference' => $mockReference]));
+
+    $response->assertRedirect(route('payment.success', [
+        'sale' => $sale->id,
+        'reference' => $mockReference,
+    ]));
+
+    $sale->refresh();
+    // Security check: Must NOT be advanced to Processing
+    expect($sale->status)->toBe(SaleStatus::PendingPayment)
+        ->and($sale->payment_status)->toBe(PaymentStatus::Partial)
+        ->and((float) $sale->amount_paid)->toEqual(1000.00)
+        ->and((float) $sale->balance_due)->toEqual(99000.00)
+        ->and($sale->paid_at)->toBeNull();
+});
