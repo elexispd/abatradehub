@@ -194,19 +194,19 @@ class Product extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
-            ->format('webp')
+            ->format('jpg')
             ->fit(Fit::Crop, 300, 300)
             ->performOnCollections('images')
             ->nonQueued();
 
         $this->addMediaConversion('card')
-            ->format('webp')
+            ->format('jpg')
             ->fit(Fit::Crop, 600, 600)
             ->performOnCollections('images')
             ->nonQueued();
 
         $this->addMediaConversion('large')
-            ->format('webp')
+            ->format('jpg')
             ->fit(Fit::Max, 1400, 1400)
             ->performOnCollections('images')
             ->nonQueued();

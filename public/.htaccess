@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Serve storage files directly via Alias (bypass Laravel routing)
+    RewriteRule ^storage/ - [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

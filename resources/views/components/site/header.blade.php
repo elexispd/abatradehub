@@ -64,9 +64,11 @@
 
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-3.5 sm:px-6 lg:h-20 lg:px-8">
         {{-- Wordmark & Logo --}}
-        <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2.5" aria-label="{{ config('abatradehub.name') }} home">
-            <img src="{{ asset('img/logo.png') }}" alt="{{ config('abatradehub.name') }} logo" class="h-[50px] w-[50px] sm:h-14 sm:w-14 lg:h-16 lg:w-16 rounded-xl object-contain shadow-xs" />
-        </a>
+        <img
+            src="{{ asset('img/logo.png') }}"
+            alt="{{ config('abatradehub.name') }} logo"
+            class="h-[50px] w-[50px] sm:h-14 sm:w-14 lg:h-24 lg:w-24 xl:h-28 xl:w-28 rounded-xl object-contain shadow-xs"
+        />
 
         {{-- Desktop navigation --}}
         <nav class="hidden items-center gap-6 xl:flex" aria-label="Main">

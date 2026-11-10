@@ -11,6 +11,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -37,7 +38,13 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(fn () => asset('img/favicon.png'))
             ->font('Plus Jakarta Sans')
             ->sidebarCollapsibleOnDesktop()
-            ->navigationGroups(['Sales', 'Catalog', 'Staff Management', 'Filament Shield'])
+            ->navigationGroups([
+                'Sales',
+                'Catalog',
+                NavigationGroup::make('Analytics')->collapsible(),
+                'Staff Management',
+                'Filament Shield',
+            ])
             ->colors([
                 // Brand colours from designs/DESIGN.md (primary, secondary, tertiary, error).
                 'primary' => Color::hex('#9f3e07'),
@@ -75,3 +82,5 @@ class AdminPanelProvider extends PanelProvider
             ]);
     }
 }
+
+

@@ -31,13 +31,13 @@ class SalesAnalytics extends BaseDashboard
 
     protected static string $routePath = '/sales-analytics';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Sales';
+    protected static string | UnitEnum | null $navigationGroup = 'Analytics';
 
     protected static ?string $navigationLabel = 'Financial Analytics';
 
     protected static ?string $title = 'Sales & Financial Analytics';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
     {
@@ -71,29 +71,40 @@ class SalesAnalytics extends BaseDashboard
         $countryOptions = array_combine($countries, $countries);
 
         return $schema
+            ->columns(1)
             ->components([
-                Section::make('Financial Period & Market Filters')
-                    ->description('Filter all summary cards, charts, revenue trends, and tables in real-time')
+                Section::make('Analytics Filters')
+                    ->columnSpanFull()
+                    ->description('Refine all metrics, charts, and tables below in real-time')
+                    ->icon('heroicon-m-funnel')
+                    ->iconColor('primary')
                     ->collapsible()
+                    ->compact()
+                    ->extraAttributes([
+                        'class' => 'ring-1 ring-primary-200 dark:ring-primary-800 bg-gradient-to-br from-primary-50 to-white dark:from-primary-950 dark:to-gray-900 shadow-sm',
+                    ])
                     ->schema([
                         Select::make('period')
                             ->label('Time Period')
+                            ->prefixIcon('heroicon-m-calendar-days')
+                            ->prefixIconColor('primary')
                             ->options([
-                                'this_month' => 'This Month',
-                                'last_month' => 'Last Month',
-                                'this_week' => 'This Week',
-                                'last_week' => 'Last Week',
-                                'today' => 'Today',
-                                'yesterday' => 'Yesterday',
+                                'this_month'   => 'This Month',
+                                'last_month'   => 'Last Month',
+                                'this_week'    => 'This Week',
+                                'last_week'    => 'Last Week',
+                                'today'        => 'Today',
+                                'yesterday'    => 'Yesterday',
                                 'this_quarter' => 'This Quarter',
-                                'this_year' => 'This Year',
-                                'custom' => 'Custom Date Range',
+                                'this_year'    => 'This Year',
+                                'custom'       => 'Custom Date Range',
                             ])
                             ->default('this_month')
                             ->live(),
 
                         DatePicker::make('start_date')
                             ->label('Start Date')
+                            ->prefixIcon('heroicon-m-arrow-right-circle')
                             ->visible(fn (Get $get) => $get('period') === 'custom')
                             ->default(now()->startOfMonth())
                             ->maxDate(now())
@@ -101,26 +112,31 @@ class SalesAnalytics extends BaseDashboard
 
                         DatePicker::make('end_date')
                             ->label('End Date')
+                            ->prefixIcon('heroicon-m-arrow-left-circle')
                             ->visible(fn (Get $get) => $get('period') === 'custom')
                             ->default(now())
                             ->live(),
 
                         Select::make('destination_country')
                             ->label('Destination Market')
+                            ->prefixIcon('heroicon-m-globe-alt')
+                            ->prefixIconColor('info')
                             ->options($countryOptions)
-                            ->placeholder('All Destinations (Domestic & Exports)')
+                            ->placeholder('All Destinations')
                             ->live(),
 
                         Select::make('payment_status')
                             ->label('Payment Status')
+                            ->prefixIcon('heroicon-m-credit-card')
+                            ->prefixIconColor('success')
                             ->options(PaymentStatus::class)
-                            ->placeholder('All Payment Statuses')
+                            ->placeholder('All Statuses')
                             ->live(),
                     ])
                     ->columns([
                         'default' => 1,
-                        'sm' => 2,
-                        'md' => 4,
+                        'sm'      => 2,
+                        'lg'      => 5,
                     ]),
             ]);
     }
@@ -139,3 +155,4 @@ class SalesAnalytics extends BaseDashboard
         ];
     }
 }
+

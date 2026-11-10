@@ -49,6 +49,7 @@ class StaffPermissionSeeder extends Seeder
 
     public const PAGE_PERMISSIONS = [
         'View:SalesAnalytics',
+        'View:SalesInsights',
     ];
 
     public function run(): void
@@ -117,11 +118,12 @@ class StaffPermissionSeeder extends Seeder
             'ViewAny:Category', 'View:Category',
             'ViewAny:Enquiry', 'View:Enquiry', 'Create:Enquiry', 'Update:Enquiry',
             'ViewAny:Sale', 'View:Sale', 'Create:Sale', 'Update:Sale',
-            'View:SalesAnalytics',
+            'View:SalesAnalytics', 'View:SalesInsights',
             'print_invoice', 'record_payment',
             'change_enquiry_status', 'assign_enquiry', 'export_enquiries',
             'View:LatestEnquiries', 'View:StatsOverview',
         ]);
     }
 }
+
 

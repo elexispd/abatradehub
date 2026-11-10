@@ -1,0 +1,1 @@
+<?php $s=app(App\Services\ProductSalesAnalyticsService::class); $f=["period"=>"this_year"]; echo json_encode($s->summary($f)),"\n",$s->byCategoryQuery($f)->count(),"|",$s->bySupplierQuery($f)->get()->count(),"|",$s->byProductQuery($f)->get()->count(),"|",$s->trend($f)->count(),"\n"; $u=App\Models\User::first(); echo get_class($u);
